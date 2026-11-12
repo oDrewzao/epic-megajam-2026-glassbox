@@ -19,7 +19,7 @@
 
 | Mechanic | Status | Key System / Device | Details & Execution Notes |
 | :--- | :---: | :--- | :--- |
-| **Director's Remote** | `Planned (Phase 1)` | Signal Remote Manager | Secondary Fire cycles active tool; Primary Fire executes tool deducting *Film Rolls*. |
+| **Director's Remote** | `In Progress (Phase 1.3)` | `edit_remote_device` + Signal Remote Manager | Verse core compiles. Secondary signal cycles `Cut` / `Freeze Frame`; primary spends Film Rolls and calls Phase 1.4 stubs. `Rewind`, `Fast Forward`, and `Plot Armor` are enumerated but locked. |
 | `CUT! (Scissors)` | `Planned (Phase 1)` | Verse Spatial Query | Deletes nearest enemy in front of player (2 Rolls). Cut-tape VFX/SFX. |
 | `FREEZE FRAME` | `Planned (Phase 1)` | Spawner Pause / Stun | Temporal pause on all active enemies & hazards (1 Roll). Sepia post-process tint. |
 | `REWIND` | `Planned (Phase 3)` | Circular State Buffer | Rewinds player position and health 3 seconds back in time (2 Rolls). Reverse audio. |
@@ -41,7 +41,7 @@
 
 - **Topology:** **Fixed-Stage Constellation** (isolated pre-built stage volumes routed via Verse teleporters). Eliminates runtime procedural generation to guarantee 100% NavMesh stability.
 - **Stage Classes:**
-  1. **Backstage Hub:** Safe staging area, monitor desks, wardrobe, director's chair, Film Strip selection station.
+  1. **Backstage Hub:** Safe staging area, monitor desks, wardrobe/dressing room, director's chair, Film Strip selection station. *(Status: Floor envelope placed, Player Spawner active, diegetic prop palette curated on staging grid).*
   2. **Action Combat Sets:** Thematic arenas (Western Saloon, Cyberpunk Rooftop, Sci-Fi Bay, Noir Alley, Haunted Library, Castle Dungeon). Tight cover, diegetic contrast lighting.
   3. **Stunt & Hazard Sets:** High-speed obstacle courses (ramp leaps, collapsing floors, laser corridors) testing movement editing (*Freeze Frame*, *Fast-Forward*).
 

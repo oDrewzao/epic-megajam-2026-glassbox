@@ -20,10 +20,11 @@
 
 ## 1. Project & Level Identity
 
-- **UEFN Project Name:** *(TBD at Phase 1 kickoff)*
-- **Primary Level (`.umap`):** *(TBD at Phase 1 kickoff)*
-- **Suggested Outliner Organization:** `00_CoreManagers`, `01_BackstageHub`, `02_CombatSets/*`, `03_StuntSets/*` *(flexible; manifest mirrors actual Outliner paths)*
-- **Last Synced (ET):** `2026-11-11T22:55:12-05:00` *(Pre-Kickoff Empty Template)*
+- **UEFN Project Name:** `DirectorsCutRoguelike`
+- **Primary Level (`.umap`):** `DirectorsCutRoguelike.umap`
+- **Project Directory:** `C:\Users\andre\OneDrive\Documentos\Fortnite Projects\DirectorsCutRoguelike`
+- **Suggested Outliner Organization:** `00_CoreManagers`, `01_BackstageHub`, `02_CombatSets/*`, `03_StuntSets/*`
+- **Last Synced (ET):** `2026-11-12T06:50:39-05:00` (Phase 1.2 folder sync + Phase 1.3 remote core)
 
 ---
 
@@ -31,7 +32,7 @@
 
 | Stage ID | Stage Name | Set Class | Outliner Folder | Origin XYZ (cm) | Approx Bounds (X x Y x Z cm) | Entry Teleporter / Spawner | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| *TBD* | *Populated in Phase 1–2* | — | — | — | — | — | `Pending` |
+| `STAGE_00` | `Backstage Hub` | `Backstage Hub` | `01_BackstageHub` | `(-4.75, -481.58, 116.00)` *(spawn anchor; LUF: L=481.58, U=116.00, F=-4.75)* | `~1536 x 1536 x 400` *(3x3 tiles, 512 cm)* | `Player Spawner` on Floor A6, yaw `85°` | `In Progress` |
 
 ---
 
@@ -41,7 +42,7 @@
 
 | Gameplay Tag | Verse Consumer (File / Class) | Target Actor Group (Summary) | Purpose |
 | :--- | :--- | :--- | :--- |
-| *TBD* | *Populated in Phase 1–2* | — | — |
+| *TBD* | *Populated in Phase 1.3–2* | — | — |
 
 ---
 
@@ -49,7 +50,10 @@
 
 | Outliner Label | Outliner Folder | Device / Class | Linked Verse / Tag | Role & Critical Config |
 | :--- | :--- | :--- | :--- | :--- |
-| *TBD* | *Populated in Phase 1–2* | — | — | — |
+| `Player Spawner` | `01_BackstageHub` | `FortPlayerStartCreative` | — | Hub spawn on Floor A6. Native `XYZ (-4.75, -481.58, 116.00)`, rotator pitch `0` / yaw `85` / roll `0`. Editor LUF `L=481.58, U=116.00, F=-4.75`. |
+| `Signal Remote Manager` | `00_CoreManagers` | `signal_remote_manager_device` | `edit_remote_device` | Captures Primary/Secondary fire events from the Signal Remote item. |
+| `Item Granter` | `00_CoreManagers` | `item_granter_device` | — | Grants 1x `Signal Remote` on game start / player spawn. |
+| `Edit Remote Device` | `00_CoreManagers` | `edit_remote_device` *(Verse)* | `SignalRemoteManager` | Core controller managing active tool cycling & Film Roll balance. |
 
 ---
 
@@ -59,4 +63,4 @@
 
 | Verse Device (Outliner Label) | `@editable` Property | Expected Target (Label / Tag) | Wired in Editor? | Notes |
 | :--- | :--- | :--- | :---: | :--- |
-| *TBD* | *Populated in Phase 1–2* | — | `[ ]` | — |
+| `Edit Remote Device` | `SignalRemoteManager` | `Signal Remote Manager` in `00_CoreManagers` | `[x]` | `MaxFilmRolls = 10`, `StartingFilmRolls = 5`. Wired in editor; pending live `CUT!`/`FREEZE` implementation (1.4). |
