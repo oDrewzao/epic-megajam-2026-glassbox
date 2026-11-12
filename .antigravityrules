@@ -28,4 +28,11 @@
    To keep chats lean and all tools synchronized across Antigravity, Cursor, Claude Code, and other agents, ALWAYS consult:
    - `references/competition_rules.md`: Mandatory rules, ET deadlines, judging criteria, and modifier rules.
    - `references/living_design_reference.md`: The active, evolving living single source of truth for features, architecture, and roadmap. Keep this file updated dynamically whenever scope, mechanics, or architectural choices change.
+   - `references/level_manifest.md`: Lightweight navigation index of Stage origins/bounds, Gameplay Tags, core interactive/Verse devices, and `@editable` wiring contracts.
    *(Note: `devlog/game_design_context.md` is a frozen historical pre-kickoff snapshot).*
+
+6. LEVEL MANIFEST AUTOMATION & ZERO-BLOAT PROTOCOL:
+   - **No Global Map Scans:** Read `references/level_manifest.md` at session start to orient yourself; NEVER run an unfiltered full-level actor dump when the manifest already locates the target folder, label, or Gameplay Tag.
+   - **Anchors & Contracts Only:** NEVER record static geometry, walls, floors, decorative props, or non-interactive lights in `references/level_manifest.md`. Group repetitive gameplay actors via Gameplay Tags instead of listing individual actors.
+   - **Locate via Manifest, Verify via Targeted MCP:** Before modifying, moving, or wiring an actor via `uefn-mcp`, run a targeted/filtered query (by label, Outliner folder, or Gameplay Tag) to confirm live editor state. Store coordinates in **UE Native `XYZ` (cm)** (convert to/from `LUF` when communicating with the user).
+   - **Silent Delta Updates & Auto-Heal:** Automatically update only the affected row(s) in `references/level_manifest.md` whenever you create, modify, rename, or remove a Stage, Gameplay Tag, core Device, or `@editable` wiring contract, or if a targeted MCP query reveals manual human edits in the UEFN editor. Never create standalone `telemetry_log.md` entries solely for manifest maintenance; note it concisely inside the main task's `Execution & Code/Assets` bullet when applicable.
