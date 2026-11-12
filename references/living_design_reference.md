@@ -10,7 +10,7 @@
 - **Core Concept:** Fast-paced action roguelite set within a chaotic B-movie production. The player plays an expendable action lead / stunt performer whose primary weapon is the **Director's Remote** (diegetic reality editing).
 - **Official Jam Theme:** DIRECTOR'S CUT (Theme interpretation: Diegetic cinematic editing + playing out cut scenes / spliced takes).
 - **Target Platform:** UEFN (Fortnite Ecosystem) | Single-player 1vE.
-- **Current Milestone:** Pre-Kickoff Preparation (Targeting Start at Nov 12, 2026, 12:00 AM ET).
+- **Current Milestone:** Phase 1: Foundational Sandbox & Remote Core (Day 1 - Jam Active, Kickoff Passed at Nov 12, 12:00 AM ET).
 - **Memory Budget Limit:** < 100,000 Spatial Thermo units.
 
 ---
@@ -77,7 +77,7 @@
 
 ## 8. Development Phases & Current Progress
 
-- **[ ] Phase 1: Foundational Sandbox & Remote Core** *(Backstage Hub envelope, Signal Remote bindings, `CUT!`, `FREEZE FRAME`)*
+- **[>] Phase 1: Foundational Sandbox & Remote Core (ACTIVE)** *(Backstage Hub envelope, Signal Remote bindings, `CUT!`, `FREEZE FRAME`)*
 - **[ ] Phase 2: Stage Generation & Scene Flow Infrastructure** *(Modular arena sets, diegetic lighting, Scene Flow Router, Stanley Conversation Device)*
 - **[ ] Phase 3: Meta-Progression, Audio & Extended Tools** *(Film Strip UMG UI, `REWIND` circular buffer, `FAST-FORWARD`, audio SFX)*
 - **[ ] Phase 4: Validation, Trailer & Submission** *(100% English audit, Glass Box devlog export, Private Version Code generation, 30-60s 1080p trailer)*

@@ -4,7 +4,7 @@
 - **Official Theme:** DIRECTOR'S CUT
 - **Official Jam Timezone:** Eastern Time (ET / EST / UTC-5) [Contest Period: Nov 12, 12:00 AM ET - Nov 15, 8:59 PM ET]
 - **Platform:** UEFN (Unreal Editor for Fortnite / Verse / Creative 2.0)
-- **Version:** `0.2.2`
+- **Version:** `0.3.0`
 - **Image Hosting Base URL (Raw):** `https://raw.githubusercontent.com/oDrewzao/epic-megajam-2026-glassbox/main/devlog/images/`
 - **Image Hosting Base URL (jsDelivr CDN):** `https://cdn.jsdelivr.net/gh/oDrewzao/epic-megajam-2026-glassbox@main/devlog/images/`
 - **Image Pipeline Rule:** Every incoming screenshot, sketch, or diagram dropped into chat or assets is copied to `devlog/images/` using sequential normalized filenames (`fig01_theme_concept.png`, `fig02_level_sketch.png`, etc.) and immediately staged with `git add`.
@@ -78,3 +78,22 @@
 - **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
   - No Verse errors or AI hallucinations; pre-kickoff tooling preparation only (UEFN MCP server offline on port `8000` at authoring time, demonstrating the exact non-live scenario the manifest addresses).
   - *Scope Guardrail Applied:* Rejected full-actor indexing upfront to prevent token bloat and stale-cache bugs from manual UEFN viewport edits, adopting a targeted verification + auto-heal protocol instead.
+
+---
+
+### [2026-11-12T06:02:29-05:00] (06:02:29 ET) - [LEVEL ARCHITECTURE] - Initialize UEFN Project Sandbox (DirectorsCutRoguelike)
+- **Environment & Exact Model:** Antigravity / Gemini 3.8 Flash
+- **Subsystem:** Level Architecture / UEFN Project Setup / Phase 1 Foundational Sandbox
+- **Design Rationale (Director's Intent):** The competition window has officially opened (Day 1, 06:02 ET). Established the blank slate UEFN project `DirectorsCutRoguelike` to serve as the master container for the single-player 1vE "Director's Cut" roguelite. This officially initiates Phase 1 of the technical roadmap: establishing the foundational sandbox to construct the Backstage Hub and hook the core Signal Remote editing controllers.
+- **Prompt Used (Translated to English):** `Map project created in UEFN. Ready to start the work. [Attached screenshot of UEFN Editor with DirectorsCutRoguelike blank grid stage]`
+- **Execution & Code/Assets:**
+  - Ingested creator's UEFN screenshot into image pipeline as `devlog/images/fig01_uefn_project_initialized.png`.
+  - Staged and embedded Figure 01:
+<div style="text-align: center; margin: 20px 0;"><img src="https://raw.githubusercontent.com/oDrewzao/epic-megajam-2026-glassbox/main/devlog/images/fig01_uefn_project_initialized.png" alt="Initial UEFN Project Sandbox (DirectorsCutRoguelike)" style="max-width: 100%; border-radius: 8px;"/><p><em>Figure 01: Initial UEFN Project Sandbox (DirectorsCutRoguelike)</em></p></div>
+  - Verified project filesystem presence at `Fortnite Projects/DirectorsCutRoguelike` with `DirectorsCutRoguelike.umap` and project manifests.
+  - Redacted internal Epic session/project ID hash from public telemetry logs per Rule 2.
+  - Transitioned `references/living_design_reference.md` milestone status from Pre-Kickoff to active Phase 1.
+  - Bumped project version tracking to `0.3.0`.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - No Verse errors or AI hallucinations.
+  - *MCP Diagnostics:* Queried `uefn-mcp` tools; observed inactive transport session (`Unknown session id`), confirming MCP bridge will need reconnection when live actor manipulation is required. Direct filesystem access to Verse/project files verified.
