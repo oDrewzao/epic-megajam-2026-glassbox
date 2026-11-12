@@ -24,7 +24,7 @@
 - **Primary Level (`.umap`):** `DirectorsCutRoguelike.umap`
 - **Project Directory:** `C:\Users\andre\OneDrive\Documentos\Fortnite Projects\DirectorsCutRoguelike`
 - **Suggested Outliner Organization:** `00_CoreManagers`, `01_BackstageHub`, `02_CombatSets/*`, `03_StuntSets/*`
-- **Last Synced (ET):** `2026-11-12T06:50:39-05:00` (Phase 1.2 folder sync + Phase 1.3 remote core)
+- **Last Synced (ET):** `2026-11-12T08:15:11-05:00` (Phase 1.4 CUT & FREEZE FRAME logic compiled, Hub Guard Spawner placed)
 
 ---
 
@@ -42,7 +42,7 @@
 
 | Gameplay Tag | Verse Consumer (File / Class) | Target Actor Group (Summary) | Purpose |
 | :--- | :--- | :--- | :--- |
-| *TBD* | *Populated in Phase 1.3–2* | — | — |
+| `director_enemy_spawner_tag` | `shared_data.verse` / `edit_remote_device` | `guard_spawner_device` instances (`Hub Guard Spawner`, stage spawners) | Dynamic discovery of all active enemy spawners for stasis & spawn suppression during `FREEZE FRAME`. |
 
 ---
 
@@ -54,6 +54,7 @@
 | `Signal Remote Manager` | `00_CoreManagers` | `signal_remote_manager_device` | `edit_remote_device` | Captures Primary/Secondary fire events from the Signal Remote item. |
 | `Item Granter` | `00_CoreManagers` | `item_granter_device` | — | Grants 1x `Signal Remote` on game start / player spawn. |
 | `Edit Remote Device` | `00_CoreManagers` | `edit_remote_device` *(Verse)* | `SignalRemoteManager` | Core controller managing active tool cycling & Film Roll balance. |
+| `Hub Guard Spawner` | `01_BackstageHub` | `guard_spawner_device` | `director_enemy_spawner_tag` | Test guard spawner opposite Player Spawner. Native `XYZ (0.00, 512.00, 12.00)`, yaw `-90°`. Editor LUF `L=-512.00, U=12.00, F=0.00`. "Despawn Guards When Disabled" must be `FALSE`. |
 
 ---
 
@@ -63,4 +64,5 @@
 
 | Verse Device (Outliner Label) | `@editable` Property | Expected Target (Label / Tag) | Wired in Editor? | Notes |
 | :--- | :--- | :--- | :---: | :--- |
-| `Edit Remote Device` | `SignalRemoteManager` | `Signal Remote Manager` in `00_CoreManagers` | `[x]` | `MaxFilmRolls = 10`, `StartingFilmRolls = 5`. Wired in editor; pending live `CUT!`/`FREEZE` implementation (1.4). |
+| `Edit Remote Device` | `SignalRemoteManager` | `Signal Remote Manager` in `00_CoreManagers` | `[x]` | `MaxFilmRolls = 10`, `StartingFilmRolls = 5`. Wired in editor. |
+| `Edit Remote Device` | `TestGuardSpawners` | `Hub Guard Spawner` in `01_BackstageHub` | `[ ]` | Array property. Requires manual addition of `Hub Guard Spawner` in Details panel (MCP automated binding rejected). |

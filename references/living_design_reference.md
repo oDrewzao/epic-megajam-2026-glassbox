@@ -19,9 +19,9 @@
 
 | Mechanic | Status | Key System / Device | Details & Execution Notes |
 | :--- | :---: | :--- | :--- |
-| **Director's Remote** | `In Progress (Phase 1.3)` | `edit_remote_device` + Signal Remote Manager | Verse core compiles. Secondary signal cycles `Cut` / `Freeze Frame`; primary spends Film Rolls and calls Phase 1.4 stubs. `Rewind`, `Fast Forward`, and `Plot Armor` are enumerated but locked. |
-| `CUT! (Scissors)` | `Planned (Phase 1)` | Verse Spatial Query | Deletes nearest enemy in front of player (2 Rolls). Cut-tape VFX/SFX. |
-| `FREEZE FRAME` | `Planned (Phase 1)` | Spawner Pause / Stun | Temporal pause on all active enemies & hazards (1 Roll). Sepia post-process tint. |
+| **Director's Remote** | `Core Complete (Phase 1.4)` | `edit_remote_device` + Signal Remote Manager | Verse core compiles with SUCCESS. Secondary signal cycles `Cut` / `Freeze Frame`; primary executes active tool and deducts rolls. `Rewind`, `Fast Forward`, and `Plot Armor` enumerated for Phase 3. |
+| `CUT! (Scissors)` | `Implemented in Verse (Compiling)` | Verse Spatial Query | Deletes nearest living enemy within 2500 cm and dot product >= 0.45 (2 Rolls, 9999.0 damage). Refunds rolls if no target in sight. |
+| `FREEZE FRAME` | `Implemented in Verse (Compiling)` | Spawner Pause / Stun | Temporal stasis on active enemies, disables spawners without despawn, generation counter handles rapid re-casts (1 Roll, 4s duration). |
 | `REWIND` | `Planned (Phase 3)` | Circular State Buffer | Rewinds player position and health 3 seconds back in time (2 Rolls). Reverse audio. |
 | `FAST-FORWARD` | `Planned (Phase 3)` | Impulse / Velocity Mod | Explosive horizontal dash forward (1 Roll). |
 | `PLOT ARMOR` | `Planned (Phase 3)` | Invincibility Buff | Temporary god-mode; weapon shots create cinematic explosions (3 Rolls). |
@@ -77,7 +77,10 @@
 
 ## 8. Development Phases & Current Progress
 
-- **[>] Phase 1: Foundational Sandbox & Remote Core (ACTIVE)** *(Backstage Hub envelope, Signal Remote bindings, `CUT!`, `FREEZE FRAME`)*
+- **[>] Phase 1: Foundational Sandbox & Remote Core (ACTIVE)**
+  - *Hub Environment:* Floor envelope placed, Player Spawner active, dressing room prop palette curated.
+  - *Remote Logic:* `edit_remote_device.verse` compiles cleanly with full `CUT!` (aim dot-product query, refund on miss) and `FREEZE FRAME` (enemy stasis, generation-counter timeout).
+  - *Pending Playtest:* Manual wiring of `TestGuardSpawners` to `Hub Guard Spawner` in Details panel; in-session verification pass.
 - **[ ] Phase 2: Stage Generation & Scene Flow Infrastructure** *(Modular arena sets, diegetic lighting, Scene Flow Router, Stanley Conversation Device)*
 - **[ ] Phase 3: Meta-Progression, Audio & Extended Tools** *(Film Strip UMG UI, `REWIND` circular buffer, `FAST-FORWARD`, audio SFX)*
 - **[ ] Phase 4: Validation, Trailer & Submission** *(100% English audit, Glass Box devlog export, Private Version Code generation, 30-60s 1080p trailer)*
