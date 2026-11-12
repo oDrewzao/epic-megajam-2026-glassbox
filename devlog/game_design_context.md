@@ -1,6 +1,6 @@
 # UEFN Game Design Document (Living GDD) - 2026 Epic AI MegaJam
 
-> **INITIAL CONCEPT NOTICE:** This document captures the initial pre-kickoff design specification (`GDD SPEC-2026`). Mechanics, scope, tooling approaches, and features remain living targets subject to iteration and deliberate cuts throughout development.
+> **HISTORICAL PRE-KICKOFF SNAPSHOT (FROZEN):** This document is preserved as the static pre-kickoff baseline specification (`GDD SPEC-2026`) recorded in the devlog. For the active, dynamic living design reference, active feature status, and real-time scope cuts updated throughout development, see [`references/living_design_reference.md`](file:///c:/Users/andre/OneDrive/Documentos/AntigravityProjects/MegaJam/references/living_design_reference.md).
 
 - **Working Title:** DIRECTOR'S CUT ROGUELIKE *(A Fast-Paced Action Roguelite with Real-Time Timeline Editing Mechanics)*
 - **Official Jam Theme:** DIRECTOR'S CUT
