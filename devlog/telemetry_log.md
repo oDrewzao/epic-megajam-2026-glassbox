@@ -4,7 +4,7 @@
 - **Official Theme:** DIRECTOR'S CUT
 - **Official Jam Timezone:** Eastern Time (ET / EST / UTC-5) [Contest Period: Nov 12, 12:00 AM ET - Nov 15, 8:59 PM ET]
 - **Platform:** UEFN (Unreal Editor for Fortnite / Verse / Creative 2.0)
-- **Version:** `0.3.2`
+- **Version:** `0.3.3`
 - **Image Hosting Base URL (Raw):** `https://raw.githubusercontent.com/oDrewzao/epic-megajam-2026-glassbox/main/devlog/images/`
 - **Image Hosting Base URL (jsDelivr CDN):** `https://cdn.jsdelivr.net/gh/oDrewzao/epic-megajam-2026-glassbox@main/devlog/images/`
 - **Image Pipeline Rule:** Every incoming screenshot, sketch, or diagram dropped into chat or assets is copied to `devlog/images/` using sequential normalized filenames (`fig01_theme_concept.png`, `fig02_level_sketch.png`, etc.) and immediately staged with `git add`.
@@ -186,3 +186,24 @@
   - *Verse Compiler Trap (String vs Message):* Verse strictly prohibits raw strings (`[]char`) in UI widgets without a localized message declaration. Grok 4.7 hallucinated multiple non-existent or internal conversion APIs before finding `<localizes>:message`.
   - *MCP Editor Limitation:* Automated assignment of `TestGuardSpawners` array property via MCP failed because the editor rejected the actor assignment through the MCP bridge. The spawner must be assigned manually in the Details panel.
   - *Actionable Zero-Burn Recovery Plan:* No further autonomous agent build loops allowed for Phase 1.4. The human developer will execute the 3 manual setup steps directly in UEFN (drag `Hub Guard Spawner` to `TestGuardSpawners`, attach tag, test in-session). HUD viewport attachment deferred to Phase 3 / Verse UI Kit integration with zero token waste.
+
+---
+
+### [2026-11-12T08:30:00-05:00] (08:30:00 ET) - [GOVERNANCE] - Enact Token Burnout Safeguard (Rule 7) & Diagnose Signal Remote Input Disconnect
+- **Environment & Exact Model:** Antigravity / Gemini 3.8 Flash
+- **Subsystem:** Multi-Agent Governance / Cost Safeguards / Verse Input Diagnostics
+- **Design Rationale (Director's Intent):** In direct response to the developer's quota containment directive, formalizes a binding multi-agent safeguard protocol (Rule 7) preventing unconstrained build-poll loops. Simultaneously triaged an input breakdown where the Signal Remote stopped emitting tool-cycling print traces and primary fire activations.
+- **Prompt Used (Translated to English):** `1. To avoid this kind of failure, simple engine actions that are fast to perform manually and save lots of tokens must be delegated to me before proceeding. 2. Create a containment safeguard to prevent token burns like this one. 3. The remote buttons stopped showing prints indicating function switching. Clicking left click is not doing anything.`
+- **Execution & Code/Assets:**
+  - Instituted **Rule 7 (Token Burnout Safeguard & Human Delegation Protocol)** across all four agent protocol files (`.antigravityrules`, `.cursorrules`, `CLAUDE.md`, `AGENTS.md`):
+    1. *Max 2-Attempt Cap:* Autonomous compile/fix loops halt immediately after 2 consecutive errors.
+    2. *Strict Ban on Exploratory MCP Brute-Forcing:* No trial-and-error API guessing via live build cycles.
+    3. *Mandatory Human Delegation:* Sub-30-second editor tasks (wiring, property toggles, asset dragging) must be delegated directly to the developer with concise steps.
+  - Enhanced `Content/edit_remote_device.verse`:
+    1. Added `for (ExistingPlayer : GetPlayspace().GetPlayers()): InitAgent(ExistingPlayer)` inside `OnBegin` so pre-spawned editor playtest characters initialize without waiting for `PlayerAddedEvent`.
+    2. Injected entry-point debug traces (`DEBUG: OnSecondarySignal received from Agent!`, `DEBUG: OnPrimarySignal received from Agent!`) to isolate input propagation from tool execution logic.
+  - Diagnosed root causes for silent input failure: (a) UEFN property deserialization wiping the `@editable SignalRemoteManager` binding to `None` following Verse struct changes, (b) player character not actively holding the Signal Remote item in hand, or (c) remote item ID mismatch between `Item Granter` and `Signal Remote Manager`.
+  - Bumped project version tracking to `0.3.3`.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - No Verse compilation errors introduced.
+  - *Input Pipeline Diagnostic:* Because neither secondary nor primary signal handlers print their first line, the signal disconnect occurs at the UEFN device-to-Verse binding level (unwired `@editable` or item unequipped in character hands), not within Verse mathematical calculations or enemy queries.
