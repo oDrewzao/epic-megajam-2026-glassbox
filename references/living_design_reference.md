@@ -10,7 +10,7 @@
 - **Core Concept:** Fast-paced action roguelite set within a chaotic B-movie production. The player plays an expendable action lead / stunt performer whose primary weapon is the **Director's Remote** (diegetic reality editing).
 - **Official Jam Theme:** DIRECTOR'S CUT (Theme interpretation: Diegetic cinematic editing + playing out cut scenes / spliced takes).
 - **Target Platform:** UEFN (Fortnite Ecosystem) | Single-player 1vE.
-- **Current Milestone:** Phase 1: Foundational Sandbox & Remote Core (Day 1 - Jam Active, Kickoff Passed at Nov 12, 12:00 AM ET).
+- **Current Milestone:** Phase 2: Fixed-Stage Constellation & Scene Flow (Day 1–2 — Phase 1 Sandbox Verified Complete).
 - **Memory Budget Limit:** < 100,000 Spatial Thermo units.
 
 ---
@@ -19,9 +19,9 @@
 
 | Mechanic | Status | Key System / Device | Details & Execution Notes |
 | :--- | :---: | :--- | :--- |
-| **Director's Remote** | `Core Complete (Phase 1.4)` | `edit_remote_device` + Signal Remote Manager | Verse core compiles with SUCCESS. Secondary signal cycles `Cut` / `Freeze Frame`; primary executes active tool and deducts rolls. `Rewind`, `Fast Forward`, and `Plot Armor` enumerated for Phase 3. |
-| `CUT! (Scissors)` | `Implemented in Verse (Compiling)` | Verse Spatial Query | Deletes nearest living enemy within 2500 cm and dot product >= 0.45 (2 Rolls, 9999.0 damage). Refunds rolls if no target in sight. |
-| `FREEZE FRAME` | `Implemented in Verse (Compiling)` | Spawner Pause / Stun | Temporal stasis on active enemies, disables spawners without despawn, generation counter handles rapid re-casts (1 Roll, 4s duration). |
+| **Director's Remote** | `Verified Working (Phase 1.5)` | `edit_remote_device` + two `trigger_device` bridges + Tier 1 Verse HUD | Live playtest verified Primary/Secondary clicks, `HudTopOffset = 240.0`, `RemoteHeldChecker` visibility gating, and `Cut` centered crosshair (`White` -> `Tomato` on valid target). |
+| `CUT! (Scissors)` | `Verified Working (Phase 1.5)` | Verse Spatial Query | Deletes nearest living enemy within 2500 cm and dot product >= 0.45 (2 Rolls, 9999.0 damage). Refunds rolls if no target in sight. |
+| `FREEZE FRAME` | `Verified Working (Phase 1.5)` | Spawner Pause / Stun | Temporal stasis on active enemies, disables spawners without despawn, generation counter handles rapid re-casts (1 Roll, 4s duration). |
 | `REWIND` | `Planned (Phase 3)` | Circular State Buffer | Rewinds player position and health 3 seconds back in time (2 Rolls). Reverse audio. |
 | `FAST-FORWARD` | `Planned (Phase 3)` | Impulse / Velocity Mod | Explosive horizontal dash forward (1 Roll). |
 | `PLOT ARMOR` | `Planned (Phase 3)` | Invincibility Buff | Temporary god-mode; weapon shots create cinematic explosions (3 Rolls). |
@@ -49,8 +49,9 @@
 
 ## 5. Meta-Progression: Film Strip Drafting
 
-- **UI Interface:** Custom modal rendering three 35mm film strips prior to stage transitions.
-- **Implementation Strategy:** Preferred via **UMG UI** using Verse UI Kit best practices.
+- **UI Interface:** Two-tier HUD/UI strategy:
+  - **Tier 1 (Phase 1.5 — Verified Working Live):** Lightweight pure Verse HUD in `edit_remote_device.verse` (`overlay` / `stack_box` / `text_block` + `<localizes>` `StringToMessage`, `ui_input_mode.None`, one widget tree per player). Top padding is `@editable HudTopOffset` (default `240.0`). `RemoteHeldChecker` (`conditional_button_device.IsHoldingItem`) is wired and gates visibility to only while the Signal Remote is held. A centered crosshair appears only for `Cut` and turns `Tomato` while `FindCutTarget` succeeds.
+  - **Tier 2 (Phase 3.1 — Final Polish):** Custom 35mm Film Strip Drafting modal and final Cinema HUD built via **UMG UI + `VerseUIKit`** bound in Verse (Verse Fields + MVVM + `UW_Feedback_Toast`).
 - **Card Pools:**
   - *Modifiers:* Run-specific stat buffs (speed, damage, roll capacity).
   - *Tool Unlocks / Upgrades:* Unlocking advanced tools (`Rewind`, `Plot Armor`) or discounting roll costs.
@@ -77,10 +78,11 @@
 
 ## 8. Development Phases & Current Progress
 
-- **[>] Phase 1: Foundational Sandbox & Remote Core (ACTIVE)**
+> **Granular Execution Checklist:** Track item-by-item progress across chats in [`references/development_checklist.md`](development_checklist.md).
+
+- **[x] Phase 1: Foundational Sandbox & Remote Core (VERIFIED COMPLETE)**
   - *Hub Environment:* Floor envelope placed, Player Spawner active, dressing room prop palette curated.
-  - *Remote Logic:* `edit_remote_device.verse` compiles cleanly with full `CUT!` (aim dot-product query, refund on miss) and `FREEZE FRAME` (enemy stasis, generation-counter timeout).
-  - *Pending Playtest:* Manual wiring of `TestGuardSpawners` to `Hub Guard Spawner` in Details panel; in-session verification pass.
-- **[ ] Phase 2: Stage Generation & Scene Flow Infrastructure** *(Modular arena sets, diegetic lighting, Scene Flow Router, Stanley Conversation Device)*
+  - *Remote Logic & Tier 1 HUD:* `edit_remote_device.verse` compiles cleanly and is verified live: trigger-bridged `CUT!` (aim dot-product query, refund on miss) and `FREEZE FRAME` (enemy stasis, generation-counter timeout), plus Tier 1 Verse HUD at `HudTopOffset = 240.0`, `RemoteHeldChecker` held-item gating, and `Cut` crosshair (`White` / `Tomato`). *(Optional VFX/SFX hooks `1.4.6` deferred).*
+- **[>] Phase 2: Stage Generation & Scene Flow Infrastructure (ACTIVE)** *(Modular arena sets, diegetic lighting, Scene Flow Router, Stanley Conversation Device)*
 - **[ ] Phase 3: Meta-Progression, Audio & Extended Tools** *(Film Strip UMG UI, `REWIND` circular buffer, `FAST-FORWARD`, audio SFX)*
 - **[ ] Phase 4: Validation, Trailer & Submission** *(100% English audit, Glass Box devlog export, Private Version Code generation, 30-60s 1080p trailer)*

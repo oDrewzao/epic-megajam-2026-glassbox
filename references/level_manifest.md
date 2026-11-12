@@ -24,7 +24,7 @@
 - **Primary Level (`.umap`):** `DirectorsCutRoguelike.umap`
 - **Project Directory:** `C:\Users\andre\OneDrive\Documentos\Fortnite Projects\DirectorsCutRoguelike`
 - **Suggested Outliner Organization:** `00_CoreManagers`, `01_BackstageHub`, `02_CombatSets/*`, `03_StuntSets/*`
-- **Last Synced (ET):** `2026-11-12T08:15:11-05:00` (Phase 1.4 CUT & FREEZE FRAME logic compiled, Hub Guard Spawner placed)
+- **Last Synced (ET):** `2026-11-12T11:02:31-05:00` (Phase 1.5 verified live; `Remote Held Checker` wired and active; Phase 1 closed)
 
 ---
 
@@ -53,7 +53,10 @@
 | `Player Spawner` | `01_BackstageHub` | `FortPlayerStartCreative` | — | Hub spawn on Floor A6. Native `XYZ (-4.75, -481.58, 116.00)`, rotator pitch `0` / yaw `85` / roll `0`. Editor LUF `L=481.58, U=116.00, F=-4.75`. |
 | `Signal Remote Manager` | `00_CoreManagers` | `signal_remote_manager_device` | `edit_remote_device` | Captures Primary/Secondary fire events from the Signal Remote item. |
 | `Item Granter` | `00_CoreManagers` | `item_granter_device` | — | Grants 1x `Signal Remote` on game start / player spawn. |
-| `Edit Remote Device` | `00_CoreManagers` | `edit_remote_device` *(Verse)* | `SignalRemoteManager` | Core controller managing active tool cycling & Film Roll balance. |
+| `Edit Remote Device` | `00_CoreManagers` | `edit_remote_device` *(Verse)* | `PrimarySignalTrigger`, `SecondarySignalTrigger` | Core controller. Input enters through the two trigger bridges. `SignalRemoteManager` is optional. |
+| `Primary Signal Trigger` | `00_CoreManagers` | `trigger_device` | `edit_remote_device.PrimarySignalTrigger` | Place in editor. Bind Signal Remote Manager primary (left click) -> Trigger. |
+| `Secondary Signal Trigger` | `00_CoreManagers` | `trigger_device` | `edit_remote_device.SecondarySignalTrigger` | Place in editor. Bind Signal Remote Manager secondary (right click) -> Trigger. |
+| `Remote Held Checker` | `00_CoreManagers` | `conditional_button_device` | `edit_remote_device.RemoteHeldChecker` | Placed in `00_CoreManagers`. Key item set to Signal Remote. Verified live: HUD shows only while `IsHoldingItem` succeeds. |
 | `Hub Guard Spawner` | `01_BackstageHub` | `guard_spawner_device` | `director_enemy_spawner_tag` | Test guard spawner opposite Player Spawner. Native `XYZ (0.00, 512.00, 12.00)`, yaw `-90°`. Editor LUF `L=-512.00, U=12.00, F=0.00`. "Despawn Guards When Disabled" must be `FALSE`. |
 
 ---
@@ -64,5 +67,8 @@
 
 | Verse Device (Outliner Label) | `@editable` Property | Expected Target (Label / Tag) | Wired in Editor? | Notes |
 | :--- | :--- | :--- | :---: | :--- |
-| `Edit Remote Device` | `SignalRemoteManager` | `Signal Remote Manager` in `00_CoreManagers` | `[x]` | `MaxFilmRolls = 10`, `StartingFilmRolls = 5`. Wired in editor. |
-| `Edit Remote Device` | `TestGuardSpawners` | `Hub Guard Spawner` in `01_BackstageHub` | `[ ]` | Array property. Requires manual addition of `Hub Guard Spawner` in Details panel (MCP automated binding rejected). |
+| `Edit Remote Device` | `SignalRemoteManager` | `Signal Remote Manager` in `00_CoreManagers` | `[ ]` | Optional (`?signal_remote_manager_device`). Bypassed cleanly by the two `trigger_device` bridges below. |
+| `Edit Remote Device` | `PrimarySignalTrigger` | `Primary Signal Trigger` in `00_CoreManagers` | `[x]` | Wired & verified in live UEFN playtest; Direct Event Binding from `Signal Remote Manager` fires `OnPrimarySignal`. |
+| `Edit Remote Device` | `SecondarySignalTrigger` | `Secondary Signal Trigger` in `00_CoreManagers` | `[x]` | Wired & verified in live UEFN playtest; Direct Event Binding from `Signal Remote Manager` fires `OnSecondarySignal`. |
+| `Edit Remote Device` | `TestGuardSpawners` | `Hub Guard Spawner` in `01_BackstageHub` | `[x]` | Verified working in live UEFN playtest (`CUT!` and `FREEZE FRAME` affect Hub Guard). |
+| `Edit Remote Device` | `RemoteHeldChecker` | `Remote Held Checker` in `00_CoreManagers` | `[x]` | Wired & verified in live UEFN playtest; Tier 1 HUD appears only while holding the Signal Remote. |
