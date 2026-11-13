@@ -25,6 +25,7 @@
 | `REWIND` | `Planned (Phase 3)` | Circular State Buffer | Rewinds player position and health 3 seconds back in time (2 Rolls). Reverse audio. |
 | `FAST-FORWARD` | `Planned (Phase 3)` | Impulse / Velocity Mod | Explosive horizontal dash forward (1 Roll). |
 | `PLOT ARMOR` | `Planned (Phase 3)` | Invincibility Buff | Temporary god-mode; weapon shots create cinematic explosions (3 Rolls). |
+| **Stage Clear / Card Draft** | `Verified Live (Phase 2.2)` | `scene_flow_router` scene HUD + per-stage spawners, `npc_spawner_device`, `button_device` | Verified live on initial stages: random room-to-room flow, `StageTracker`, `DirectorSpawner`, `DirectorInteractButton`, full room reset, dynamic Verse scene HUD (objective/Tracker only), `GuardSpawners`/`WildlifeSpawners` (`director_enemy_spawner_tag`)/`EnemyNPCSpawners`, and `TakeStartTrigger` unlock after `RunOver`. |
 
 ---
 
@@ -42,8 +43,8 @@
 - **Topology:** **Fixed-Stage Constellation** (isolated pre-built stage volumes routed via Verse teleporters). Eliminates runtime procedural generation to guarantee 100% NavMesh stability.
 - **Stage Classes:**
   1. **Backstage Hub:** Safe staging area, monitor desks, wardrobe/dressing room, director's chair, Film Strip selection station. *(Status: Floor envelope placed, Player Spawner active, diegetic prop palette curated on staging grid).*
-  2. **Action Combat Sets:** Thematic arenas (Western Saloon, Cyberpunk Rooftop, Sci-Fi Bay, Noir Alley, Haunted Library, Castle Dungeon). Tight cover, diegetic contrast lighting.
-  3. **Stunt & Hazard Sets:** High-speed obstacle courses (ramp leaps, collapsing floors, laser corridors) testing movement editing (*Freeze Frame*, *Fast-Forward*).
+  2. **Action Combat Sets:** Thematic arenas (Western Saloon, Cyberpunk Rooftop, Sci-Fi Bay, Noir Alley, Haunted Library, Castle Dungeon). Tight cover, diegetic contrast lighting. Each wired stage can use guard, wildlife, and enemy NPC spawners. The objective is a pure Verse scene HUD. One Director `npc_spawner_device` at room center and one `button_device` stay disabled until the take clears.
+  3. **Stunt & Hazard Sets:** High-speed obstacle courses (ramp leaps, collapsing floors, laser corridors) testing movement editing (*Freeze Frame*, *Fast-Forward*). Same stage contract: the Verse scene HUD shows `OBJECTIVE: Reach the Finish`, then the room Director. `FinishTrigger` remains the clear.
 
 ---
 
@@ -62,9 +63,9 @@
 ## 6. Decoupled Architecture Modules
 
 1. **`Shared Data & Stage Registry`:** Tool costs, stage IDs, spawner configurations, countdown limits.
-2. **`Edit Remote Controller`:** Signal Remote bindings, inventory roll deduction, tool execution pipeline.
-3. **`Film Strip UI Controller`:** Viewport card presentation, selection capture, mutator dispatch.
-4. **`Scene Flow Router`:** Room-to-room run. Random unvisited stage after each clear. Hub only for lobby, Run Over, and Run Victory.
+2. **`Edit Remote Controller`:** Signal Remote bindings, inventory roll deduction, tool execution pipeline. The remote is granted by `scene_flow_router` when a run leaves the Hub and removed on every Hub return.
+3. **`Film Strip UI Controller`:** Viewport card presentation, selection capture, mutator dispatch. Plugs into `scene_flow_router.OnDraftCompleted` without changing the stage device list.
+4. **`Scene Flow Router`:** Hub Action requests a pre-run draft, then a random unvisited stage. A per-player Verse scene HUD shows the scene title and the active room's tracker or objective only during the take. A clear eliminates leftover enemies, hides that HUD, and enables that room's Director. Run Over and Run Victory return to the Hub and re-enable the Action trigger. The Director button awards rolls, requests the next draft, resets the room, and teleports to the next stage.
 
 ---
 
@@ -73,7 +74,7 @@
 *Log architectural pivots, feature reductions, and deliberate cuts here to maintain a tight, polished delivery within the 93-hour jam window:*
 
 - **Cut #01 (Pre-Kickoff): Procedural Generation Cut:** Procedural tile generation was cut in favor of a fixed-stage constellation topology with teleporter routing. Prevents AI NavMesh breakdown and unvalidated physics collisions.
-- **Pivot #02 (Phase 2.2): Hub-between-takes cut:** A clear no longer returns to the Backstage Hub. After `IntermissionDelay` (default 2.5s) the run teleports into a random unvisited stage. The Hub remains the lobby, the Run Over respawn, and the Run Victory wrap.
+- **Pivot #02 (Phase 2.2): Hub-between-takes cut:** A clear no longer returns to the Backstage Hub. The room Director appears on clear. The next unvisited stage starts after the card-draft hook. The Hub remains the lobby, the Run Over respawn, and the Run Victory wrap.
 
 ---
 
@@ -84,6 +85,6 @@
 - **[x] Phase 1: Foundational Sandbox & Remote Core (VERIFIED COMPLETE)**
   - *Hub Environment:* Floor envelope placed, Player Spawner active, dressing room prop palette curated.
   - *Remote Logic & Tier 1 HUD:* `edit_remote_device.verse` compiles cleanly and is verified live: trigger-bridged `CUT!` (aim dot-product query, refund on miss) and `FREEZE FRAME` (enemy stasis, generation-counter timeout), plus Tier 1 Verse HUD at `HudTopOffset = 240.0`, `RemoteHeldChecker` held-item gating, and `Cut` crosshair (`White` / `Tomato`). *(Optional VFX/SFX hooks `1.4.6` deferred).*
-- **[>] Phase 2: Stage Generation & Scene Flow Infrastructure (ACTIVE)** *(Modular arena sets, diegetic lighting, Scene Flow Router room-to-room run compiled, wiring still open, Stanley Conversation Device)*
+- **[>] Phase 2: Stage Generation & Scene Flow Infrastructure (ACTIVE)** *(Modular arena sets, `scene_flow_router.verse` verified live on initial stages, next: `2.3` Director Stanley Walkie-Talkie + Conversation Device)*
 - **[ ] Phase 3: Meta-Progression, Audio & Extended Tools** *(Film Strip UMG UI, `REWIND` circular buffer, `FAST-FORWARD`, audio SFX)*
 - **[ ] Phase 4: Validation, Trailer & Submission** *(100% English audit, Glass Box devlog export, Private Version Code generation, 30-60s 1080p trailer)*

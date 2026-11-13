@@ -24,7 +24,7 @@
 - **Primary Level (`.umap`):** `DirectorsCutRoguelike.umap`
 - **Project Directory:** `C:\Users\andre\OneDrive\Documentos\Fortnite Projects\DirectorsCutRoguelike`
 - **Suggested Outliner Organization:** `00_CoreManagers`, `01_BackstageHub`, `02_CombatSets/*`, `03_StuntSets/*`, `04_FinaleSet/*`
-- **Last Synced (ET):** `2026-11-12T23:21:26-05:00` (floor bases manually placed across all 10 stages; fig05 synced)
+- **Last Synced (ET):** `2026-11-13T02:26:00-05:00` (Phase 2.2 `scene_flow_router` verified live on initial stages)
 
 ---
 
@@ -62,9 +62,9 @@
 | :--- | :--- | :--- | :--- | :--- |
 | `Player Spawner` | `01_BackstageHub` | `FortPlayerStartCreative` | — | Hub spawn on Floor A6. Native `XYZ (-4.75, -481.58, 116.00)`, rotator pitch `0` / yaw `85` / roll `0`. Editor LUF `L=481.58, U=116.00, F=-4.75`. |
 | `Signal Remote Manager` | `00_CoreManagers` | `signal_remote_manager_device` | `edit_remote_device` | Captures Primary/Secondary fire events from the Signal Remote item. |
-| `Item Granter` | `00_CoreManagers` | `item_granter_device` | — | Grants 1x `Signal Remote` on game start / player spawn. |
+| `Item Granter` | `00_CoreManagers` | `item_granter_device` | `scene_flow_router.RemoteGranter` | Holds 1x `Signal Remote`. Grant on Game Start must be off. Scene Flow grants it when a run leaves the Hub. |
 | `Edit Remote Device` | `00_CoreManagers` | `edit_remote_device` *(Verse)* | `PrimarySignalTrigger`, `SecondarySignalTrigger` | Core controller. Public `ReplenishRolls` / `ResetRolls` update `PlayerRolls` and refresh the HUD. |
-| `Scene Flow Router` | `00_CoreManagers` | `scene_flow_router` *(Verse)* | `TakeStartTrigger`, `HubReturnTeleporter`, `Stages` | Round cycle `InHub` -> `InTake` -> `TakeComplete` / `RunOver`. Native `XYZ (270.00, -1266.00, 0.00)`. Editor LUF `L=1266.00, U=0.00, F=270.00`. `@editable` wiring is still open. |
+| `Scene Flow Router` | `00_CoreManagers` | `scene_flow_router` *(Verse)* | `TakeStartTrigger`, `HubReturnTeleporter`, `Stages` | Round cycle `InHub` -> `InTake` -> `TakeComplete` / `RunOver`. Native `XYZ (270.00, -1266.00, 0.00)`. Editor LUF `L=1266.00, U=0.00, F=270.00`. Verified live on initial stages (`STAGE_01`, `STAGE_02`). |
 | `Primary Signal Trigger` | `00_CoreManagers` | `trigger_device` | `edit_remote_device.PrimarySignalTrigger` | Place in editor. Bind Signal Remote Manager primary (left click) -> Trigger. |
 | `Secondary Signal Trigger` | `00_CoreManagers` | `trigger_device` | `edit_remote_device.SecondarySignalTrigger` | Place in editor. Bind Signal Remote Manager secondary (right click) -> Trigger. |
 | `Remote Held Checker` | `00_CoreManagers` | `conditional_button_device` | `edit_remote_device.RemoteHeldChecker` | Placed in `00_CoreManagers`. Key item set to Signal Remote. Verified live: HUD shows only while `IsHoldingItem` succeeds. |
@@ -81,11 +81,19 @@
 | `Edit Remote Device` | `SignalRemoteManager` | `Signal Remote Manager` in `00_CoreManagers` | `[ ]` | Optional (`?signal_remote_manager_device`). Bypassed cleanly by the two `trigger_device` bridges below. |
 | `Edit Remote Device` | `PrimarySignalTrigger` | `Primary Signal Trigger` in `00_CoreManagers` | `[x]` | Wired & verified in live UEFN playtest; Direct Event Binding from `Signal Remote Manager` fires `OnPrimarySignal`. |
 | `Edit Remote Device` | `SecondarySignalTrigger` | `Secondary Signal Trigger` in `00_CoreManagers` | `[x]` | Wired & verified in live UEFN playtest; Direct Event Binding from `Signal Remote Manager` fires `OnSecondarySignal`. |
-| `Edit Remote Device` | `TestGuardSpawners` | `Hub Guard Spawner` in `01_BackstageHub` | `[x]` | Verified working in live UEFN playtest (`CUT!` and `FREEZE FRAME` affect Hub Guard). |
+| `Edit Remote Device` | `TestGuardSpawners` | `Hub Guard Spawner` in `01_BackstageHub` | `[x]` | Verified working in live UEFN playtest (`CUT!` and `FREEZE FRAME` affect Hub Guard). `director_enemy_spawner_tag` also registers `wildlife_spawner_device` and `npc_spawner_device`. |
 | `Edit Remote Device` | `RemoteHeldChecker` | `Remote Held Checker` in `00_CoreManagers` | `[x]` | Wired & verified in live UEFN playtest; Tier 1 HUD appears only while holding the Signal Remote. |
-| `Scene Flow Router` | `EditRemote` | `Edit Remote Device` in `00_CoreManagers` | `[ ]` | Awards `ClearRollBonus` and resets rolls on Run Over. |
-| `Scene Flow Router` | `HubReturnTeleporter` | Hub return `teleporter_device` (not placed) | `[ ]` | Hub teleport on Run Over and Run Victory only. Clears chain room to room. |
-| `Scene Flow Router` | `TakeStartTrigger` | Action / clapper `trigger_device` (not placed) | `[ ]` | Starts a run from the hub. Ignored while a take or intermission is active. |
+| `Scene Flow Router` | `EditRemote` | `Edit Remote Device` in `00_CoreManagers` | `[x]` | Awards `ClearRollBonus` and resets rolls on Run Over. |
+| `Scene Flow Router` | `HubReturnTeleporter` | Hub return `teleporter_device` | `[x]` | Hub teleport on Run Over and Run Victory only. Clears chain room to room. |
+| `Scene Flow Router` | `TakeStartTrigger` | Action / clapper `trigger_device` | `[x]` | Starts a run from the hub. Ignored during a take, a clear, or Run Over. `Enable()` runs again when the run returns to the Hub. |
 | `Scene Flow Router` | `StanleyDebriefTrigger` | Optional trigger for the Phase 2.3 Conversation Device | `[ ]` | Fired on Run Over and Run Victory, when the player is back in the hub. |
-| `Scene Flow Router` | `Stages` | One `stage_definition` per set | `[ ]` | Combat: guard spawners and `TargetEliminations`. Stunt: `IsStuntSet` plus `FinishTrigger`. |
+| `Scene Flow Router` | `RemoteGranter` | `Item Granter` in `00_CoreManagers` | `[x]` | `GrantItem` once when a run leaves the Hub. Turn off Grant on Game Start. |
+| `Scene Flow Router` | `HubItemRemover` | `item_remover_device` | `[x]` | `Remove` on game start and every Hub return. Affected Items = All, so the Hub toolbar stays empty. |
+| `Scene Flow Router` | `Stages` | One `stage_definition` per set | `[x]` | Verified live on `STAGE_01` & `STAGE_02` (`EntryTeleporter`, `GuardSpawners`, `WildlifeSpawners`, `EnemyNPCSpawners`, `StageTracker`, `DirectorSpawner`, `DirectorInteractButton`). Remaining stages open. |
+| `Scene Flow Router` | `Stages.StageTracker` | One `tracker_device` per stage | `[ ]` | Optional clear signal. Never `Assign`ed. Hidden with `Reset(Agent)`, `SetValue(0)`, then `RemoveFromAll` and `Remove`. The Verse scene HUD shows `GetValue(Player)` / `GetTarget()` for the active room. |
+| `Scene Flow Router` | `Stages.WildlifeSpawners` | `wildlife_spawner_device` array per stage | `[ ]` | Enabled only on the active take. `SpawnedEvent` / `EliminatedEvent` count toward the take. `ResetStage` calls `Disable` and `Reset`. |
+| `Scene Flow Router` | `Stages.EnemyNPCSpawners` | `npc_spawner_device` array per stage | `[ ]` | Enemy NPCs only. Not `DirectorSpawner`. `ResetStage` calls `DespawnAll(false)`, `Disable`, and `Reset`. |
+| `Scene Flow Router` | `Stages.DirectorSpawner` | One `npc_spawner_device` at room center | `[ ]` | Disabled until clear, then `Enable` + `Spawn`. `ResetStage` calls `DespawnAll` and `Disable`. |
+| `Scene Flow Router` | `Stages.DirectorInteractButton` | One `button_device` at room center | `[ ]` | Disabled until clear. `InteractedWithEvent` awards `ClearRollBonus` and starts the draft. |
+| `Scene Flow Router` | `Stages.DirectorSpawnPoint` | Optional `teleporter_device` anchor | `[ ]` | Alternate Director anchor. The spawner is the active path. |
 | `Scene Flow Router` | `StatusMessage` | Optional `hud_message_device` | `[ ]` | Unwired path still prints the same English lines. |

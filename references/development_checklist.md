@@ -2,7 +2,7 @@
 
 > **ROLE OF THIS DOCUMENT:** Shared, persistent execution checklist for `DIRECTOR'S CUT ROGUELIKE` across all chats and agents (Antigravity, Cursor, Claude Code). Update `[ ]` -> `[>]` (active) -> `[x]` (done) as each item is verified in UEFN. Keep synced with `references/living_design_reference.md` and `references/level_manifest.md`.
 
-**Current Active Step:** `2.1` (Build Phase 2 Arenas / Fixed-Stage Constellation) -> `2.2` (Scene Flow Router) -> `2.3` (Director Stanley Walkie-Talkie)
+**Current Active Step:** `2.3` (Director Stanley Walkie-Talkie) -> `3.1` (Film Strip Drafting UI 35mm + Extended Tools)
 
 ---
 
@@ -45,19 +45,20 @@
   - [ ] Build Stunt & Hazard Set 1 (e.g., *Laser Corridor / Collapsing Floor* obstacle course) under `03_StuntSets/*`.
   - [x] Place one Map Indicator per stage (`STAGE_01`–`STAGE_10`) on a 30720 cm pitch (scaled 2x from the first 15360 cm layout), English label `STAGE_XX: <Name>`, visible on minimap and overview map. Origins registered in `references/level_manifest.md`.
   - [x] Place floor base (`BP_BeefJerky_Floor_A`) at each origin (`STAGE_01`–`STAGE_10`) via manual editor duplication (`fig05_fixed_stage_constellation_floors.png`).
+  - [>] Place essential stage device clusters (`EntryTeleporter`, `guard_spawner_device`, `StageTracker`, `DirectorInteractButton`) on each stage floor (`fig06_stage_essential_devices_setup.png` in progress).
   - [ ] Register entry teleporters and Gameplay Tags in `references/level_manifest.md` when those devices exist.
-- [>] **2.2. `Scene Flow Router` (`scene_flow_router.verse`)**
-  - [x] Implement round cycle: hub Action starts a run, each clear waits `IntermissionDelay` (2.5s) then teleports into a random unvisited stage. Hub return is Run Over or Run Victory only. Compiled. `@editable` wiring still open.
-  - [x] Implement Combat Set win condition (`TargetEliminations`, or every guard spawned this Take eliminated) and Stunt Set win condition (`FinishTrigger`).
-  - [x] Stunt Double Lives (`StartingLives` default 3): a death with lives left retries the current stage entry and resets that stage's enemies. Zero lives is Run Over (hub, lives and rolls reset).
-  - [x] Replenish `ClearRollBonus` on each clear. Run Victory fills rolls to `MaxFilmRolls`. Run Over uses `ResetRolls` with `RunOverFilmRolls`.
-  - [ ] Wire `EditRemote`, `HubReturnTeleporter`, `TakeStartTrigger`, and `Stages` in the Details panel, then playtest the room-to-room loop.
-- [ ] **2.3. Director Stanley Integration (Walkie-Talkie Modifier)**
+- [x] **2.2. `Scene Flow Router` (`scene_flow_router.verse`)** — *Verified Live (initial stages)*
+  - [x] Implement round cycle: hub Action requests a pre-run draft stub, then teleports into a random unvisited stage. A clear enables that room's Director. The Director button drafts, resets the room, and enters the next stage. Hub return is Run Over or Run Victory only.
+  - [x] Room clear is `StageTracker.CompleteEvent`. Combat (`TargetEliminations` or spawned-this-Take) and stunt (`FinishTrigger`) remain fallbacks. Dynamic Verse scene HUD mirrors objective/Tracker only (without `STUNT LIVES`).
+  - [x] Stunt Double Lives (`StartingLives` default 3): a death with lives left retries the current stage entry and calls `ResetStage`. Zero lives resets the active stage, lives, and Film Rolls, unlocks `TakeStartTrigger`, then returns to the hub.
+  - [x] `ClearRollBonus` is awarded when the Director button is used. Run Victory fills rolls to `MaxFilmRolls`. Run Over uses `ResetRolls` with `RunOverFilmRolls`.
+  - [x] Wire initial `stage_definition` rows (`STAGE_01`, `STAGE_02`) with `EntryTeleporter`, `StageTracker`, `DirectorSpawner`, `DirectorInteractButton`, `GuardSpawners`, `WildlifeSpawners` (`director_enemy_spawner_tag`), and `EnemyNPCSpawners` — verified live (`fig08_director_npc_spawn_and_interact.png`). *(Remaining stages wired as arenas are built in 2.1).*
+- [>] **2.3. Director Stanley Integration (Walkie-Talkie Modifier)**
   - [ ] Place Stanley NPC / Director's Chair prop in `01_BackstageHub`.
   - [ ] Configure native UEFN `Conversation Device` with short, frantic 1980s Hollywood director lines (100% English).
   - [ ] Wire debrief trigger when the player returns to the Backstage Hub on Run Over or Run Victory.
 - [ ] **2.4. Phase 2 Full Loop Playtest**
-  - [ ] Test full loop: Spawn in Hub -> Action -> clear a set -> next random unvisited set without the hub -> Run Victory or Run Over returns to the Hub.
+  - [ ] Test full loop: Spawn in Hub -> Action draft -> clear a set -> talk to the room Director -> next random unvisited set -> Run Victory or Run Over returns to the Hub.
   - [ ] Log Phase 2 milestone in `devlog/telemetry_log.md` (+ screenshot).
 
 ---

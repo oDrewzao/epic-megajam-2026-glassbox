@@ -399,3 +399,167 @@
 - **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
   - Zero compiler errors or runtime warnings.
   - *Strict Adherence to Rule 7:* Rather than attempting fragile MCP brute-forcing after blueprint class-filter restrictions prevented automated asset spawning, delegating manual duplication to the human developer completed the entire 10-stage constellation floor setup cleanly in minutes with zero token waste.
+
+---
+
+### [2026-11-12T23:48:35-05:00] (23:48:35 ET) - [VERSE] - Stage Device Contract and Director Draft Hook
+- **Environment & Exact Model:** Cursor / Grok 4.7
+- **Subsystem:** Verse Device
+- **Design Rationale (Director's Intent):** Each stage now has one clear contract before the 10 rooms are wired: a Tracker says the room is done, the room Director appears, and the next card draft is the door to the next stage. The Film Strip UI can replace the draft stub later without renaming those devices.
+- **Prompt Used (Translated to English):** `Finalize the stage device contract before wiring all 10 stages. Add a Tracker, a Director NPC spawner, and an interact button to stage_definition. A hub Action requests a pre-run draft stub, then starts a random stage. A clear enables the Director. The button awards rolls, drafts, resets the room, and teleports to the next unvisited stage. Check the digests first and compile once.`
+- **Execution & Code/Assets:**
+  - Digest check: `tracker_device` exposes `CompleteEvent`, `Assign`, `Reset(Agent)`, `RemoveFromAll`, and `SetValue`. It has no `Enable` or `Disable`. `button_device.InteractedWithEvent` sends an `agent`. `npc_spawner_device` exposes `Enable`, `Disable`, `Spawn`, and `DespawnAll`.
+  - Updated `stage_definition` with `StageTracker`, `DirectorSpawner`, `DirectorSpawnPoint`, and `DirectorInteractButton`. Added `ResetStage`, `RequestCardDraft`, and `OnDraftCompleted`. `BuildAll` returned 0 errors on the first compile after the editor session was reconnected.
+  - Updated the living design, the manifest wiring contract, and checklist item `2.2`.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - No compiler errors. `Enable` and `Disable` were not called on the Tracker because the digest does not define them. `IntermissionDelay` remains on the device so existing Details data is preserved, and the next room now waits on the Director button instead of that timer. If the button is unwired, the draft stub continues so the run does not soft-lock before binding.
+
+---
+
+### [2026-11-13T00:10:44-05:00] (00:10:44 ET) - [LEVEL / GAMEPLAY] - Placing Essential Device Clusters Across Stage Constellation
+- **Environment & Exact Model:** Antigravity / Gemini 3.8 Flash
+- **Subsystem:** Level Architecture / Interactive Device Setup
+- **Design Rationale (Director's Intent):** Following the updated `stage_definition` contract established in `scene_flow_router.verse`, each stage requires a baseline interactive device cluster (Entry Teleporter, active Guard Spawner, Tracker/Objective triggers, and completion interact buttons) to facilitate the autonomous room-to-room roguelite loop. Placing these foundational sets across the constellation stages prepares the physical actors for Details-panel binding into the Scene Flow Router.
+- **Prompt Used (Translated to English):** `Log: Initial sets of essential devices being placed in each stage.`
+- **Execution & Code/Assets:**
+  - Captured and linked live stage setup screenshot (`fig06_stage_essential_devices_setup.png`):
+<div style="text-align: center; margin: 20px 0;"><img src="https://raw.githubusercontent.com/oDrewzao/epic-megajam-2026-glassbox/main/devlog/images/fig06_stage_essential_devices_setup.png" alt="Placing Essential Device Sets Across Stage Constellation" style="max-width: 100%; border-radius: 8px;"/><p><em>Figure 06: In-editor placement of the essential device cluster on a stage floor platform. Visible devices include the stage Entry Teleporter pad, active Guard Spawner with visual spawn radius bounds, and objective/tracker interaction anchors matching the updated stage_definition Verse contract.</em></p></div>
+  - Verified physical setup underway in UEFN Editor:
+    1. Placing entry `teleporter_device` instances per stage floor to anchor arrival coordinates.
+    2. Placing initial `guard_spawner_device` actors tagged with `director_enemy_spawner_tag` for combat staging.
+    3. Setting up objective and completion triggers (`tracker_device` / `button_device`) ready to interface with the Director draft hook and room progression logic.
+  - Cross-agent references synced: Updated `references/development_checklist.md` item `2.1` and `references/level_manifest.md` to reflect active in-editor device population.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - Zero compiler errors or engine crashes.
+  - Device layout directly adheres to the Verse `stage_definition` contract refined in the preceding step, avoiding property mismatches during the upcoming wiring phase.
+
+---
+
+### [2026-11-13T00:45:59-05:00] (00:45:59 ET) - [PLAYTEST / DEBUGGING] - First Multi-Stage Playtest & Guard Spawner Population Diagnostic
+- **Environment & Exact Model:** Antigravity / Gemini 3.8 Flash
+- **Subsystem:** Verse Device / Level AI Spawning / Scene Flow
+- **Design Rationale (Director's Intent):** In a multi-stage roguelite constellation, each stage must represent an isolated, self-contained combat or stunt scenario. During the first live test with 2 active stages (`STAGE_01: Western Saloon` and `STAGE_02`), the debug log revealed an unexpectedly high count of active enemies (`12`–`13`), even though only 2 guards were physically visible in the active arena. Diagnosing this population anomaly is critical to ensure accurate room-clear tracking, prevent off-stage AI performance drops, and guarantee that `FREEZE FRAME` only targets current active arena threats.
+- **Prompt Used (Translated to English):** `First test with 2 active stages. Apparent problem with the quantity of active enemies.`
+- **Execution & Code/Assets:**
+  - Captured and linked live debug playtest screenshot (`fig07_two_stages_active_guard_count_debug.png`):
+<div style="text-align: center; margin: 20px 0;"><img src="https://raw.githubusercontent.com/oDrewzao/epic-megajam-2026-glassbox/main/devlog/images/fig07_two_stages_active_guard_count_debug.png" alt="First Multi-Stage Playtest with Active Enemy Count Anomaly" style="max-width: 100%; border-radius: 8px;"/><p><em>Figure 07: Live playtest in STAGE_01 (Western Saloon) showing the enemy counter anomaly. The on-screen print log reports 'Active enemies: 12' and '13' while only 2 guards are in the local arena view, alongside the active Tracker widget (0/10).</em></p></div>
+  - Root Cause Analysis Breakdown:
+    1. *Global Spawner Auto-Spawn:* `guard_spawner_device` defaults in UEFN start with `Enabled at Game Start = True` and `Auto Spawn = True`. Spawners placed on inactive stages (and the Backstage Hub) spawned their guard cohorts concurrently at match start.
+    2. *Map-Wide Tag Aggregation in Edit Remote:* `edit_remote_device.RegisterGuardSpawners` queries all devices with `director_enemy_spawner_tag` across the entire map, indiscriminately pooling enemies from all stages into a single global `ActiveEnemies` array.
+    3. *Continuous Respawn Loop:* The log shows `enemy spawned` immediately firing after `enemy eliminated`, caused by default guard spawner wave respawns replenishing eliminated guards up to the tracker goal (`0/10`).
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - Transparent analysis of engine behavior: The Verse subscription logic works correctly (deduplicating and decrementing upon eliminations), but the level spawner lifecycle lacks per-stage activation gating.
+  - Actionable Solution Strategy:
+    1. In UEFN Details for all `guard_spawner_device` actors on non-hub stages: Set `Enabled at Game Start = False` and `Auto Spawn = False` so only `scene_flow_router.StartTake` enables the active stage's spawners.
+    2. Configure `Total Spawn Limit` (e.g., 3–5 guards total) and disable infinite respawns unless specifically designed for endless waves.
+    3. Ensure `Hub Guard Spawner` is disabled when a stage run commences.
+
+---
+
+### [2026-11-13T00:56:17-05:00] (00:56:17 ET) - [VERSE] - Per-Stage Guard Spawner and Tracker Isolation
+- **Environment & Exact Model:** Cursor / Grok 4.7
+- **Subsystem:** Verse Device
+- **Design Rationale (Director's Intent):** Each take is one isolated set. Inactive stages must not spawn guards in the background, and only the room currently on camera may show its Tracker on the HUD.
+- **Prompt Used (Translated to English):** `Fix simultaneous enemy spawning and per-stage Tracker isolation in scene_flow_router.verse. Disable every guard_spawner_device with director_enemy_spawner_tag plus wired stage spawners at OnBegin and between stages. Enable only the active stage's GuardSpawners in StartTake. Increment the active StageTracker on guard eliminations. RemoveFromAll and Reset every tracker on OnBegin and ResetStage. Assign only the active tracker in StartTake. Compile once.`
+- **Execution & Code/Assets:**
+  - Digest check: `tracker_device.Reset(Agent)`, `RemoveFromAll()`, `Assign(Agent)`, `Increment(Agent)`, `SetValue`. No parameterless `Reset`. `guard_spawner_device` has `Enable`, `Disable`, `Reset`, `Despawn`. No `DespawnAll` (that method exists only on `npc_spawner_device`).
+  - `DisableAllSpawners` now disables wired `Stages[].GuardSpawners` and every `guard_spawner_device` found with `FindCreativeObjectsWithTag(director_enemy_spawner_tag)`.
+  - `SilenceAllTrackers` calls `RemoveFromAll` and `Reset(Player)` for every player on every stage tracker. Called from `OnBegin` and `ResetStage`.
+  - `StartTake` disables all spawners before setting `InTake`, then `Reset`+`Enable` only that stage's spawners, then `Reset(Player)` and `Assign(Player)` only on that stage's tracker.
+  - `OnGuardEliminated` calls `Tracker.Increment(Player)` for each current player when the elimination belongs to the active take.
+  - `VerseToolset.BuildAll`: 0 errors.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - The requested parameterless `Tracker.Reset()` is not in the digest. Per-player `Reset(Player)` is the matching call.
+  - `DespawnAll` was not called on guard spawners. `Disable` is the isolation call. Existing guards despawn only if the device option Despawn Guards When Disabled is set.
+  - Phase is set to `InTake` after the disable pass so a despawn during the handoff does not increment the next room's tracker.
+
+---
+
+### [2026-11-13T01:05:36-05:00] (01:05:36 ET) - [PLAYTEST / VERIFICATION] - Live Validation of Stage Isolation & Director Spawn Flow
+- **Environment & Exact Model:** Antigravity / Gemini 3.8 Flash
+- **Subsystem:** Gameplay Loop / Level AI Spawning / Room-to-Room Flow
+- **Design Rationale (Director's Intent):** Validates the fix for the concurrent spawner bug and confirms the stage-clear lifecycle in a live 2-stage playtest. When a stage is entered, only that stage's tracker and spawners are active; upon completing stage objectives, the room Director NPC spawns dynamically at stage center with the `[E] TALK TO DIRECTOR` prompt enabled, presenting the diegetic gateway to the next card draft and subsequent scene.
+- **Prompt Used (Translated to English):** `Register: Initial bugs fixed. Moving on to more bugfixes before proceeding.`
+- **Execution & Code/Assets:**
+  - Captured and linked live in-game verification screenshot (`fig08_director_npc_spawn_and_interact.png`):
+<div style="text-align: center; margin: 20px 0;"><img src="https://raw.githubusercontent.com/oDrewzao/epic-megajam-2026-glassbox/main/devlog/images/fig08_director_npc_spawn_and_interact.png" alt="Live Validation of Stage Isolation and Director Interaction" style="max-width: 100%; border-radius: 8px;"/><p><em>Figure 08: Live playtest in STAGE_02 (Cyberpunk Rooftop) validating successful stage isolation. The top-left HUD cleanly displays only the active room tracker ('Complete dev room 0/4'), while the room Director NPC stands spawned at the platform center with the interactive prompt '[E] TALK TO DIRECTOR' ready for player engagement.</em></p></div>
+  - Verified in live gameplay session:
+    1. *Spawner & Tracker Isolation:* Confirmed that inactive stages no longer flood the enemy counter; the top-left UI cleanly presents only the isolated active objective (`Complete dev room 0/4`).
+    2. *Director Spawn Sequence:* Upon meeting clear conditions, `DirectorSpawner.Enable()` and `DirectorSpawner.Spawn()` execute deterministically, placing Stanley/Director character in the center of the set.
+    3. *Interaction Binding:* `DirectorInteractButton` activates seamlessly with standard UEFN contextual prompt (`[E] TALK TO DIRECTOR`).
+    4. *Transition to Bugfix Pass:* Developer identified minor edge cases in the interaction/transition flow to resolve before scaling the remaining constellation stages.
+  - Synced project status: Updated `references/development_checklist.md` item `2.2` and `2.4` with live room-to-room validation notes.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - Zero Verse compiler errors or runtime aborts.
+  - Live test confirms that the tag-based spawner disabling and `SilenceAllTrackers` routines in `scene_flow_router.verse` completely eradicated the 12+ enemy leak observed in Figure 07.
+
+---
+
+### [2026-11-13T01:16:39-05:00] (01:16:39 ET) - [VERSE] - Clear Leftover Guards and Hide Trackers
+- **Environment & Exact Model:** Cursor / Grok 4.7
+- **Subsystem:** Verse Device
+- **Design Rationale (Director's Intent):** A cleared set should cut to the Director with no leftover extras still fighting, and the objective widget should exist only while that take is on camera. The Hub, the post-clear beat, and the return to the Hub stay free of tracker chrome.
+- **Prompt Used (Translated to English):** `Fix two bugs in scene_flow_router.verse. On room clear, kill every living guard tracked for the active take. Keep every tracker_device off the HUD at game start, after a clear, and after returning to the Hub. Assign a tracker only inside StartTake. Check the digest first. Compile once.`
+- **Execution & Code/Assets:**
+  - Digest check: `tracker_device.Reset(Agent:agent)`, `SetValue(Value:int)`, `RemoveFromAll()`, `Remove(Agent)`. No parameterless `Reset`. `fort_character` implements `damageable.Damage(Amount:float)` and failable `IsActive()`. `guard_spawner_device.EliminatedEvent` sends `device_ai_interaction_result` whose `Target` is the eliminated guard. `SpawnedEvent` sends the guard `agent`.
+  - Active-take guards are stored in `TakeGuards` from `OnGuardSpawned(StageIndex, Enemy)` and removed in `OnGuardEliminated` via `Result.Target`. `EliminateActiveTakeGuards` calls `Char.Damage(9999.0)` on each living character, then clears the list. A `ClearingGuards` flag stops that sweep from re-entering the clear.
+  - `CompleteTake` runs `DisableAllSpawners`, then `EliminateActiveTakeGuards`, then `HideAllStageTrackers`, then `PresentDirector`. The same eliminate call follows `DisableAllSpawners` in `RunOver`, `RunVictory`, and `OnPlayerEliminated`.
+  - `HideTracker` calls `Reset(Player)`, `SetValue(0)`, then `RemoveFromAll` and `Remove(Player)`. Used from `ResetStage`, `RunOver`, `RunVictory`, `CompleteTake`, and `OnBegin` after `Sleep(0.2)`. `Assign` remains only in `StartTake`.
+  - Updated the StageTracker row in `references/level_manifest.md` and the Stage Clear row in `references/living_design_reference.md`.
+  - `VerseToolset.BuildAll`: 0 errors (`returnValue` empty). No second compile.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - The requested parameterless `Tracker.Reset()` is not in the digest. Per-player `Reset(Player)` is the call that was compiled.
+  - `guard_spawner_device` still has no `DespawnAll`. Leftover guards are removed with `fort_character.Damage`, not a spawner despawn.
+
+---
+
+### [2026-11-13T01:38:46-05:00] (01:38:46 ET) - [VERSE] - Scene HUD and Wildlife/NPC Spawners
+- **Environment & Exact Model:** Cursor / Grok 4.7
+- **Subsystem:** Verse Device
+- **Design Rationale (Director's Intent):** The objective card should be part of the film, not a native tracker widget, and it should leave the screen the moment the take is no longer rolling. Guards, wildlife, and enemy NPCs are the same extras: they count toward the take, and CUT and FREEZE FRAME can hit any of them.
+- **Prompt Used (Translated to English):** `Replace the native Tracker HUD with a pure-Verse scene HUD in scene_flow_router.verse. Show scene title, combat or stunt objective, and stunt lives only while a take is active, below the Edit Remote HUD. Add wildlife_spawner_device and npc_spawner_device arrays on each stage, and register tagged wildlife and NPC spawners in edit_remote_device so CUT and FREEZE FRAME affect them. Check the digests first. Compile once.`
+- **Execution & Code/Assets:**
+  - Digest check: `wildlife_spawner_device` and `npc_spawner_device` both expose `SpawnedEvent(agent)`, `EliminatedEvent(device_ai_interaction_result)`, `Enable()`, `Disable()`, and parameterless `Reset()`. Only `npc_spawner_device` has `DespawnAll(?agent)`. Scene HUD widgets follow the existing `edit_remote_device` overlay: `text_block`, `stack_box`, `overlay`, `player_ui.AddWidget`, `ui_input_mode.None`, `widget_visibility`.
+  - Added `scene_hud` (`Root`, `SceneText`, `ObjectiveText`, `LivesText`) at top-left `Left := 40.0`, `Top := 380.0`, `ZOrder := 9`. `Root` starts collapsed and is visible only while `Phase = InTake`. Lines are `SCENE: {StageTitle}`, `TARGETS: eliminated / goal` or `TARGETS: eliminated cleared`, `OBJECTIVE: Reach the Finish` on stunt sets, and `STUNT LIVES: {GetLives}`.
+  - `StartTake` no longer calls `Tracker.Assign`. When `TargetEliminations` is 0 and the stage tracker goal is above 0, that goal still clears the combat take. Otherwise the take still clears when every spawned enemy is gone.
+  - `stage_definition` gained `WildlifeSpawners` and `EnemyNPCSpawners`. Both bind spawn and elimination like guards, so they update `TakeEliminated`, `TakeGuards`, and the scene HUD. `DisableAllSpawners` and `ResetStage` disable and reset them. Enemy NPC reset also calls `DespawnAll(false)`. `DirectorSpawner` stays separate.
+  - `RegisterGuardSpawners` and `SetSpawnersEnabled` now include tagged `wildlife_spawner_device` and `npc_spawner_device` actors, so their agents enter `ActiveEnemies`.
+  - Updated `references/level_manifest.md` and `references/living_design_reference.md`.
+  - `VerseToolset.BuildAll`: 0 errors (`returnValue` empty). No second compile.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - No compiler errors. Widget fields were copied from the compiled Edit Remote HUD instead of guessed.
+  - `wildlife_spawner_device` has `Despawn(Agent)`, not `DespawnAll`. Living wildlife are removed through the tracked-agent `Damage(9999.0)` path.
+  - FREEZE FRAME release still re-enables every tagged spawner it disabled, including wildlife and NPC devices. Inactive stages should keep Enabled at Game Start off so a freeze does not wake another set.
+
+---
+
+### [2026-11-13T02:04:15-05:00] (02:04:15 ET) - [VERSE] - Scene HUD Tracker Mirror and Hub Action Reset
+- **Environment & Exact Model:** Cursor / Grok 4.7
+- **Subsystem:** Verse Device
+- **Design Rationale (Director's Intent):** The scene card should show only the room that is rolling, using that room's own objective count. After a run ends, the Hub Action has to be able to call the next take. A consumed or phase-locked trigger would leave the player in the lobby with no way to start.
+- **Prompt Used (Translated to English):** `Remove stunt lives from the scene HUD and show only the active room objective, preferring tracker GetValue and GetTarget. After a death that returns to the Hub, reset the phase to InHub, clear draft locks, clear the active stage, and enable TakeStartTrigger so a new run can start. Compile once.`
+- **Execution & Code/Assets:**
+  - Digest check: `tracker_device.GetValue(Agent)` and `GetTarget()` both exist. `trigger_device.Enable()` exists on `trigger_base_device`. There is no `DraftPending` or intermission lock field. The draft lock in this device is `DraftIsPreRun`.
+  - Removed `LivesText` from `scene_hud`. During a take the HUD shows `SCENE: {StageTitle}` and, when a tracker is wired, `TARGETS: {GetValue(Player)} / {GetTarget()}`. Otherwise a stunt set shows `OBJECTIVE: Reach the Finish` and a combat set shows `TARGETS: {TakeEliminated} / {TargetEliminations}`.
+  - `ReturnToHub` sets `DraftIsPreRun = false`, `ActiveStageIndex = -1`, `Phase = InHub`, calls `TakeStartTrigger.Enable()`, and hides the scene HUD. `RunOver`, the zero-life path in `OnPlayerEliminated`, and `RunVictory` all end there. `OnTakeStart` ignores input while `Phase` is `RunOver`, so the hub teleport cannot consume the Action trigger before it is enabled again.
+  - Updated the TakeStartTrigger and StageTracker rows in `references/level_manifest.md` and the Scene Flow Router note in `references/living_design_reference.md`.
+  - `VerseToolset.BuildAll`: 0 errors (`returnValue` empty). No second compile.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - No compiler errors. `GetValue(Player)` matches the per-agent digest overload. `Player` is an `agent`.
+  - `trigger_base_device.Reset()` was not called. Its digest comment sets the remaining trigger count back to 0, which would not re-arm a limited trigger. `Enable()` is the call that was compiled.
+
+---
+
+### [2026-11-13T02:15:33-05:00] (02:15:33 ET) - [VERSE] - Grant the Signal Remote Only on a Take
+- **Environment & Exact Model:** Cursor / Grok 4.7
+- **Subsystem:** Verse Device
+- **Design Rationale (Director's Intent):** The Backstage Hub is a lobby, not a set. The Signal Remote belongs in the actor's hand only after Action, and the Hub toolbar must stay empty when the player is waiting between runs.
+- **Prompt Used (Translated to English):** `Grant the remote when entering a scene, never while the player is in the Hub. The Hub toolbar must never contain items. Add a simple editable so the human can bind the item granter.`
+- **Execution & Code/Assets:**
+  - Digest check: `item_granter_device.GrantItem(Agent)` grants. It has no remove. `item_remover_device.Remove(Agent)` clears the items configured on the device.
+  - Added optional `RemoteGranter` and `HubItemRemover` on `scene_flow_router`. `GrantRemoteForTake` runs once inside `StartTake` when a run leaves the Hub. Later rooms and retries do not grant again. `ReturnToHub` and `OnBegin` call `HubItemRemover.Remove` for every player. A second strip runs 0.5s later only if the phase is still `InHub`, so a Grant on Game Start award does not survive the lobby.
+  - Updated `references/level_manifest.md` (Item Granter, `RemoteGranter`, `HubItemRemover`, restored `Stages.DirectorSpawner`) and the Edit Remote note in `references/living_design_reference.md`.
+  - `VerseToolset.BuildAll`: 0 errors (`returnValue` empty). No second compile.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - No compiler errors. The granter cannot empty a toolbar, so the remover is a second optional editable rather than a guessed method on `item_granter_device`.
+  - Wiring is still manual: turn off Grant on Game Start on `Item Granter`, assign it to `RemoteGranter`, place an Item Remover with Affected Items = All, and assign it to `HubItemRemover`.
