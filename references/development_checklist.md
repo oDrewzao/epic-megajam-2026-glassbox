@@ -2,7 +2,7 @@
 
 > **ROLE OF THIS DOCUMENT:** Shared, persistent execution checklist for `DIRECTOR'S CUT ROGUELIKE` across all chats and agents (Antigravity, Cursor, Claude Code). Update `[ ]` -> `[>]` (active) -> `[x]` (done) as each item is verified in UEFN. Keep synced with `references/living_design_reference.md` and `references/level_manifest.md`.
 
-**Current Active Step:** `2.3` (Director Stanley Walkie-Talkie) -> `3.1` (Film Strip Drafting UI 35mm + Extended Tools)
+**Current Active Step:** `3.1` (Film Strip Drafting UI 35mm + Verse UI Kit Audit) -> `3.2` (Extended Remote Tools: `REWIND`, `FAST-FORWARD`, `PLOT ARMOR`)
 
 ---
 
@@ -50,13 +50,13 @@
 - [x] **2.2. `Scene Flow Router` (`scene_flow_router.verse`)** — *Verified Live (initial stages)*
   - [x] Implement round cycle: hub Action requests a pre-run draft stub, then teleports into a random unvisited stage. A clear enables that room's Director. The Director button drafts, resets the room, and enters the next stage. Hub return is Run Over or Run Victory only.
   - [x] Room clear is `StageTracker.CompleteEvent`. Combat (`TargetEliminations` or spawned-this-Take) and stunt (`FinishTrigger`) remain fallbacks. Dynamic Verse scene HUD mirrors objective/Tracker only (without `STUNT LIVES`).
-  - [x] Stunt Double Lives (`StartingLives` default 3): a death with lives left retries the current stage entry and calls `ResetStage`. Zero lives resets the active stage, lives, and Film Rolls, unlocks `TakeStartTrigger`, then returns to the hub.
+  - [x] One elimination during a take is Run Over. There is no Stunt Double Lives retry. `RunOver` resets the active stage and Film Rolls, then returns to the Hub.
   - [x] `ClearRollBonus` is awarded when the Director button is used. Run Victory fills rolls to `MaxFilmRolls`. Run Over uses `ResetRolls` with `RunOverFilmRolls`.
   - [x] Wire initial `stage_definition` rows (`STAGE_01`, `STAGE_02`) with `EntryTeleporter`, `StageTracker`, `DirectorSpawner`, `DirectorInteractButton`, `GuardSpawners`, `WildlifeSpawners` (`director_enemy_spawner_tag`), and `EnemyNPCSpawners` — verified live (`fig08_director_npc_spawn_and_interact.png`). *(Remaining stages wired as arenas are built in 2.1).*
-- [>] **2.3. Director Stanley Integration (Walkie-Talkie Modifier)**
+- [>] **2.3. Director Stanley Integration (Walkie-Talkie Modifier)** — *Ready for playtest after `StanleyConversation` is assigned in Details*
   - [ ] Place Stanley NPC / Director's Chair prop in `01_BackstageHub`.
-  - [ ] Configure native UEFN `Conversation Device` with short, frantic 1980s Hollywood director lines (100% English).
-  - [ ] Wire debrief trigger when the player returns to the Backstage Hub on Run Over or Run Victory.
+  - [x] Configure native UEFN `Conversation Device` with short, frantic 1980s Hollywood director lines (100% English). Bank `CB_StanleyRadio` uses one Speech node (`fig09_stanley_radio_speech_node.png`).
+  - [x] Verse debrief: `RunVictory` calls `InitiateConversation(Player)` 0.3s after the hub teleport. `RunOver` sets `PendingStanleyDebrief` and waits for `hub_player_spawner_tag` on `Player Spawner`. `VerseToolset.BuildAll` returned no errors. The `HubPlayerSpawner` editable did not appear in Details, so the tag is the contract.
 - [ ] **2.4. Phase 2 Full Loop Playtest**
   - [ ] Test full loop: Spawn in Hub -> Action draft -> clear a set -> talk to the room Director -> next random unvisited set -> Run Victory or Run Over returns to the Hub.
   - [ ] Log Phase 2 milestone in `devlog/telemetry_log.md` (+ screenshot).
@@ -73,7 +73,7 @@
     - *Modifiers:* Speed boost, max Film Roll capacity, roll regen/bonus.
     - *Tool Unlocks / Upgrades:* Unlock `Rewind`, `Fast-Forward`, `Plot Armor`, or reduce Roll costs.
     - *Scene Booking:* Choose next Combat or Stunt set.
-  - [ ] Upgrade Tier 1 temporary Verse HUD into final **Cinema UMG HUD** bound in Verse (`VerseUIKit` SDF Film Roll meter, `UW_Feedback_Toast` alerts, Active Tool, Cost, Remaining Takes, and Stunt Double Lives).
+  - [ ] Upgrade Tier 1 temporary Verse HUD into final **Cinema UMG HUD** bound in Verse (`VerseUIKit` SDF Film Roll meter, `UW_Feedback_Toast` alerts, Active Tool, Cost, and Remaining Takes).
 - [ ] **3.2. Extended Director's Remote Tools**
   - [ ] **`REWIND` (2 Rolls):** Circular buffer recording player position + health over last 3 seconds; instant rewind on trigger.
   - [ ] **`FAST-FORWARD` (1 Roll):** Explosive horizontal dash / velocity impulse forward (useful in Stunt Sets & dodging).

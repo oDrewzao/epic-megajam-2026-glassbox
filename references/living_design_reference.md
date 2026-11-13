@@ -33,7 +33,7 @@
 
 - **NPC Director:** **Stanley** (1980s eccentric, caffeine-fueled Hollywood action director).
 - **Tone:** Fast-talking, neurotic, sarcastic, urgent. English-only 2-sentence radio calls.
-- **Integration Device:** Native UEFN `Conversation Device` triggered at Backstage Hub debriefs.
+- **Integration Device:** Native UEFN `Conversation Device`. Run Victory calls `InitiateConversation(Player)` 0.3s after the hub teleport. Run Over sets `PendingStanleyDebrief` and speaks 0.3s after the `Player Spawner` with `hub_player_spawner_tag` fires `SpawnedEvent`. One bank, `CB_StanleyRadio`, covers both returns. A stage clear does not open this radio.
 - **Action Item at Jam Start:** Validate live runtime LLM integration mechanics supported in UEFN for the Walkie-Talkie modifier.
 
 ---
@@ -65,7 +65,7 @@
 1. **`Shared Data & Stage Registry`:** Tool costs, stage IDs, spawner configurations, countdown limits.
 2. **`Edit Remote Controller`:** Signal Remote bindings, inventory roll deduction, tool execution pipeline. The remote is granted by `scene_flow_router` when a run leaves the Hub and removed on every Hub return.
 3. **`Film Strip UI Controller`:** Viewport card presentation, selection capture, mutator dispatch. Plugs into `scene_flow_router.OnDraftCompleted` without changing the stage device list.
-4. **`Scene Flow Router`:** Hub Action requests a pre-run draft, then a random unvisited stage. A per-player Verse scene HUD shows the scene title and the active room's tracker or objective only during the take. A clear eliminates leftover enemies, hides that HUD, and enables that room's Director. Run Over and Run Victory return to the Hub and re-enable the Action trigger. The Director button awards rolls, requests the next draft, resets the room, and teleports to the next stage.
+4. **`Scene Flow Router`:** Hub Action requests a pre-run draft, then a random unvisited stage. A per-player Verse scene HUD shows the scene title and the active room count only during the take. That count is the higher of the tracker total and the eliminations recorded this take. A clear eliminates leftover enemies, hides that HUD, and enables that room's Director. Any elimination during a take is Run Over: the stage and Film Rolls reset, and the player returns to the Hub. There is no life retry. Run Victory also returns to the Hub. Stanley speaks 0.3s after the victory teleport, and on Run Over only after the `Player Spawner` tagged `hub_player_spawner_tag` fires `SpawnedEvent`. The Director button awards rolls, requests the next draft, resets the room, and teleports to the next stage.
 
 ---
 
@@ -75,6 +75,7 @@
 
 - **Cut #01 (Pre-Kickoff): Procedural Generation Cut:** Procedural tile generation was cut in favor of a fixed-stage constellation topology with teleporter routing. Prevents AI NavMesh breakdown and unvalidated physics collisions.
 - **Pivot #02 (Phase 2.2): Hub-between-takes cut:** A clear no longer returns to the Backstage Hub. The room Director appears on clear. The next unvisited stage starts after the card-draft hook. The Hub remains the lobby, the Run Over respawn, and the Run Victory wrap.
+- **Cut #03 (Phase 2.3): Stunt Double Lives Cut:** Removed multi-life retries per run. Any elimination during a take (combat or stunt) immediately triggers `RunOver` and returns the player to the Backstage Hub, keeping the roguelite loop crisp and high-stakes.
 
 ---
 
@@ -85,6 +86,6 @@
 - **[x] Phase 1: Foundational Sandbox & Remote Core (VERIFIED COMPLETE)**
   - *Hub Environment:* Floor envelope placed, Player Spawner active, dressing room prop palette curated.
   - *Remote Logic & Tier 1 HUD:* `edit_remote_device.verse` compiles cleanly and is verified live: trigger-bridged `CUT!` (aim dot-product query, refund on miss) and `FREEZE FRAME` (enemy stasis, generation-counter timeout), plus Tier 1 Verse HUD at `HudTopOffset = 240.0`, `RemoteHeldChecker` held-item gating, and `Cut` crosshair (`White` / `Tomato`). *(Optional VFX/SFX hooks `1.4.6` deferred).*
-- **[>] Phase 2: Stage Generation & Scene Flow Infrastructure (ACTIVE)** *(Modular arena sets, `scene_flow_router.verse` verified live on initial stages, next: `2.3` Director Stanley Walkie-Talkie + Conversation Device)*
-- **[ ] Phase 3: Meta-Progression, Audio & Extended Tools** *(Film Strip UMG UI, `REWIND` circular buffer, `FAST-FORWARD`, audio SFX)*
+- **[x] Phase 2: Stage Generation & Scene Flow Infrastructure (CORE LOOP & STANLEY VERIFIED)** *(Modular arena sets, `scene_flow_router.verse` room-to-room run, pure roguelite permadeath, and `Stanley Conversation` Hub debrief via `HubPlayerSpawner.SpawnedEvent` standby verified live)*
+- **[>] Phase 3: Meta-Progression, Audio & Extended Tools (ACTIVE)** *(Film Strip UMG UI, `REWIND` circular buffer, `FAST-FORWARD`, `PLOT ARMOR`, audio SFX)*
 - **[ ] Phase 4: Validation, Trailer & Submission** *(100% English audit, Glass Box devlog export, Private Version Code generation, 30-60s 1080p trailer)*
