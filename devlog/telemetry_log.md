@@ -321,3 +321,81 @@
 - **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
   - Zero Verse compiler errors or editor failures.
   - Human developer confirmed live verification of `Remote Held Checker` (`conditional_button_device`), `HudTopOffset = 240.0` clearance below UEFN Edit Mode chrome, and `Cut` crosshair target-lock color feedback (`White` -> `Tomato`).
+
+---
+
+### [2026-11-12T11:28:30-05:00] (11:28:30 ET) - [LEVEL] - Place Stage Map Indicators on a 15360 cm Pitch
+- **Environment & Exact Model:** Cursor / Grok 4.7
+- **Subsystem:** Level Architecture
+- **Design Rationale (Director's Intent):** Locks the Fixed-Stage Constellation origins 30 floor tiles apart so each Action, Stunt, and Finale set can grow without overlapping NavMesh or lighting, while a Map Indicator names the set on the minimap and overview map.
+- **Prompt Used (Translated to English):** `Place one BeefJerky Floor A6 center tile at Z=0 and one English Map Indicator at Z=12 for STAGE_01 through STAGE_10, spaced 15360 cm apart, using targeted uefn-mcp lookups only. Save the actors and update the level manifest plus this telemetry log. Stop after two failed Map Indicator text or spawn attempts.`
+- **Execution & Code/Assets:**
+  - Targeted lookup: `BeefJerky Floor A6` is class `/Hera/Sets/BeefJerky/Blueprints/Floors/BP_BeefJerky_Floor_A.BP_BeefJerky_Floor_A_C` and is inside `01_BackstageHub`. Catalog device is `PID_Device_MapIndicator` (`Device_MapIndicator_V2`).
+  - Placed and saved 10 Map Indicators. Verified `STAGE_01` transform `(15360, -15360, 12)`, option `Text` = `STAGE_01: Western Saloon`, and `ShowOnWhichMap` = `Both`. `GetActorsInFolder` confirms `STAGE_01` and `STAGE_10` are in their Outliner folders.
+  - Updated `references/level_manifest.md` Section 2 with `STAGE_01`–`STAGE_10` (floor tiles omitted from Section 4) and noted the pending floor anchors on `references/development_checklist.md` item `2.1`.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - Floor spawn attempt 1, `LevelToolset.AddToSceneFromClass`: `Parameter error: /Hera/Sets/BeefJerky/Blueprints/Floors/BP_BeefJerky_Floor_A.BP_BeefJerky_Floor_A_C is not an allowed class for property 'ActorType': excluded by the project's class filter.`
+  - Floor spawn attempt 2, `LevelToolset.AddToSceneFromAsset` with the blueprint asset path: `Could not load asset at path: /Hera/Sets/BeefJerky/Blueprints/Floors/BP_BeefJerky_Floor_A.BP_BeefJerky_Floor_A`. `GetActorAssetPath` on the hub tile returns an external-actor package, which is not a spawnable asset. Stopped per the two-attempt cap. The human duplicates `BeefJerky Floor A6` onto each origin.
+  - `FindActors` reports `folderPath` `None` for actors that `GetActorsInFolder` already contains. Folder membership was confirmed with the folder query, not with `FindActors`.
+
+---
+
+### [2026-11-12T11:36:09-05:00] (11:36:09 ET) - [LEVEL] - Double Stage Map-Indicator Spacing
+- **Environment & Exact Model:** Cursor / Grok 4.7
+- **Subsystem:** Level Architecture
+- **Design Rationale (Director's Intent):** The map marker is the center of each future set. Doubling the constellation pitch from 15360 cm to 30720 cm (60 floor tiles) keeps the same layout and gives every stage a wider build footprint before it meets its neighbor.
+- **Prompt Used (Translated to English):** `The floor tiles were not placed; the human will add them manually later. Move the stage map markers farther apart, proportionally, so each marker can be the center of a more spacious set. Wait for the next task prompt after that.`
+- **Execution & Code/Assets:**
+  - Moved and saved all 10 Map Indicators by scaling X and Y by 2. Z stayed `12`. Verified transforms: `STAGE_01` `(30720, -30720, 12)` through `STAGE_10` `(0, 61440, 12)`.
+  - Updated `STAGE_01`–`STAGE_10` origins in `references/level_manifest.md` and the pitch note on checklist item `2.1`. Floor tiles remain unplaced.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - No spawn or compiler errors. The previous floor-tile class-filter failure is unchanged; floor placement stays a manual editor step.
+
+---
+
+### [2026-11-12T13:19:32-05:00] (13:19:32 ET) - [VERSE] - Scene Flow Router and Map-Indicator Lift
+- **Environment & Exact Model:** Cursor / Grok 4.7
+- **Subsystem:** Verse Device / Level Architecture
+- **Design Rationale (Director's Intent):** The map marker stays the center of each set and now sits 4 floor tiles above that center so the set can be built underneath it. The Scene Flow Router is the round cycle that spends a Take, pays Film Rolls on a clear, and spends a Stunt Double Life on a death.
+- **Prompt Used (Translated to English):** `Raise every map marker by 4 tiles. Then implement Phase 2.2 scene_flow_router.verse and public ReplenishRolls/ResetRolls hooks on edit_remote_device, after checking the local Verse digests. Compile with at most one fix. Place the router in 00_CoreManagers when MCP can do it cleanly, and update the manifest, checklist, and telemetry.`
+- **Execution & Code/Assets:**
+  - Raised all 10 Map Indicators by 2048 cm. Verified `Z=2060` (4 x 512 cm above the previous `Z=12`). Horizontal positions are unchanged. Stage origins in the manifest stay at `Z=0`.
+  - Added `ReplenishRolls` and `ResetRolls` to `Content/edit_remote_device.verse`. Both clamp to `[0, MaxFilmRolls]` and call `RefreshHud`.
+  - Added `Content/scene_flow_router.verse`: `stage_definition`, Take state machine, combat clear via `TargetEliminations` (or spawned-this-Take when that value is 0), stunt clear via `FinishTrigger`, life loss back to the hub, and Run Over.
+  - `VerseToolset.BuildAll` succeeded on the allowed retry (0 errors). Placed `Scene Flow Router` in `00_CoreManagers` at native `XYZ (270, -1266, 0)`. `@editable` wiring is still open. Updated `references/level_manifest.md` Sections 4 and 5 and checklist item `2.2`.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - First `BuildAll` failed. Two project files each defined `StringToMessage`, so every call was ambiguous. `ReplenishRolls` / `ResetRolls` also called `GetRolls` and `ClampRolls` inside a `set` failure context, which rejects `no_rollback`. The one fix renamed the router helper to `SceneFlowMessage` and computed the clamped roll value before `set`. The second `BuildAll` returned 0 errors. No third compile was run.
+  - Guard spawners have no "finished spawning" event in the digest. Combat sets with `TargetEliminations = 0` clear when every guard spawned during that Take is gone, which can happen between drip spawns. Set `TargetEliminations` to the wave size for a reliable clear.
+
+---
+
+### [2026-11-12T14:27:08-05:00] (14:27:08 ET) - [VERSE] - Room-to-Room Run Flow
+- **Environment & Exact Model:** Cursor / Grok 4.7
+- **Subsystem:** Verse Device
+- **Design Rationale (Director's Intent):** A cleared set should cut straight into the next unvisited stage. The Backstage Hub stays the lobby, the Run Over floor, and the curtain call, which keeps the run uninterrupted and still gives Stanley a reason to speak when the player actually comes home.
+- **Prompt Used (Translated to English):** `Before binding the Scene Flow Router, change it to classic room-to-room roguelite progression. Do not return to the Hub between clears. After a 2.5s wrap, teleport into a random unvisited stage via GetRandomInt. Hub return is Run Over or Run Victory only. A death with lives left retries the current stage entry and resets its enemies. Keep existing editable properties, add IntermissionDelay, and compile once.`
+- **Execution & Code/Assets:**
+  - Updated `Content/scene_flow_router.verse`. Clears announce `CUT! SCENE CLEAR! NEXT TAKE IN 3s...`, wait `IntermissionDelay`, then call `GetRandomInt(0, Candidates.Length - 1)` over uncleared stages. An empty candidate list runs victory: max Film Rolls, English wrap line, hub teleport.
+  - A death above 0 lives announces `STUNT DOUBLE DOWN! RETRYING TAKE...`, clears that stage's visited flag, resets its spawners, and teleports to its entry. Zero lives still calls `RunOver()`.
+  - `VerseToolset.BuildAll` returned 0 errors on the first compile. Existing `@editable` names are unchanged. `IntermissionDelay` defaults to `2.5`.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - No compiler errors. `GetRandomInt` was confirmed in the Verse digest as inclusive on both ends before the edit. `SceneFlowMessage` was left in place so the project package still has a single `StringToMessage`.
+
+---
+
+### [2026-11-12T23:21:26-05:00] (23:21:26 ET) - [LEVEL / MILESTONE] - Manual Placement of Floor Bases Across All Constellation Stages
+- **Environment & Exact Model:** Antigravity / Gemini 3.8 Flash
+- **Subsystem:** Level Architecture / World Building
+- **Design Rationale (Director's Intent):** Following the human delegation protocol in Rule 7, the human developer manually duplicated and placed floor bases for all 10 outlying stages around the central Backstage Hub on the 30,720 cm constellation pitch. This establishes physical anchors for all Action Combat, Stunt & Hazard, and Finale sets, preparing the ground truth geometry needed to place essential stage devices (Entry Teleporters, enemy spawners, finish triggers) and wire them into the `Scene Flow Router`.
+- **Prompt Used (Translated to English):** `Log: Manually created the floor base for all stages. Next step is creating essential elements in each one to bind to Scene Flow Router.`
+- **Execution & Code/Assets:**
+  - Captured and embedded aerial overview screenshot of the complete constellation (`fig05_fixed_stage_constellation_floors.png`):
+<div style="text-align: center; margin: 20px 0;"><img src="https://raw.githubusercontent.com/oDrewzao/epic-megajam-2026-glassbox/main/devlog/images/fig05_fixed_stage_constellation_floors.png" alt="Fixed-Stage Constellation Floor Bases Placed" style="max-width: 100%; border-radius: 8px;"/><p><em>Figure 05: Aerial overview of the Fixed-Stage Constellation in UEFN. The central square represents the Backstage Hub (STAGE_00), surrounded by the 10 outlying stage floor platforms (STAGE_01 through STAGE_10) spaced at 30,720 cm intervals to isolate gameplay, lighting, and NavMesh boundaries.</em></p></div>
+  - Verified physical layout in editor:
+    1. Backstage Hub (`STAGE_00`) remains the central lobby and restart point.
+    2. 10 surrounding stage floor platforms (`STAGE_01`–`STAGE_10`) placed at their designated coordinates (`Z=0`), centered directly beneath their elevated Map Indicators (`Z=2060`).
+    3. Updated `references/level_manifest.md` Section 2: status updated from `Indicator Placed` to `Floor Base Placed`.
+    4. Updated `references/development_checklist.md` item `2.1`: checked off manual floor tile placement. Next objective is establishing essential interactive devices (Entry Teleporters, wave Guard Spawners, Finish Triggers) to bind into `Scene Flow Router`.
+- **AI Hallucinations, Verse Errors & Human Debugging (GLASS BOX TRANSPARENCY):**
+  - Zero compiler errors or runtime warnings.
+  - *Strict Adherence to Rule 7:* Rather than attempting fragile MCP brute-forcing after blueprint class-filter restrictions prevented automated asset spawning, delegating manual duplication to the human developer completed the entire 10-stage constellation floor setup cleanly in minutes with zero token waste.

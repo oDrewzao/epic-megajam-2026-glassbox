@@ -37,24 +37,27 @@
 ---
 
 ## Phase 2: Fixed-Stage Constellation & Scene Flow (Day 2)
-> **Goal:** Player transitions between Backstage Hub and isolated pre-built arenas via teleporters with full round lifecycle and Stanley's radio debriefs.
+> **Goal:** Player leaves the Backstage Hub into a randomized room-to-room run. The Hub is only the lobby, Run Over, and Run Victory.
 
 - [>] **2.1. Build Physical Arenas (Fixed-Stage Constellation)**
   - [ ] Build Action Combat Set 1 (e.g., *Western Saloon* or *Sci-Fi Bay*) under `02_CombatSets/*` with cover, lighting, entry teleporter, and tagged Guard Spawners.
   - [ ] Build Action Combat Set 2 (e.g., *Cyberpunk Rooftop* or *Noir Alley*).
   - [ ] Build Stunt & Hazard Set 1 (e.g., *Laser Corridor / Collapsing Floor* obstacle course) under `03_StuntSets/*`.
-  - [ ] Register all Stage origins (`XYZ`), bounds, entry teleporters, and Gameplay Tags in `references/level_manifest.md`.
-- [ ] **2.2. `Scene Flow Router` (`scene_flow_router.verse`)**
-  - [ ] Implement round cycle state machine: `Backstage Hub` -> `Take Start (Clapperboard)` -> `Teleporter Routing` -> `Set Objective` -> `Cut! / Return to Hub`.
-  - [ ] Implement Combat Set win condition (all wave enemies eliminated) & Stunt Set win condition (reach finish trigger).
-  - [ ] Implement Take failure / Stunt Double Lives condition (respawn/return to Hub or Run Over).
-  - [ ] Replenish/adjust Film Rolls between Takes.
+  - [x] Place one Map Indicator per stage (`STAGE_01`–`STAGE_10`) on a 30720 cm pitch (scaled 2x from the first 15360 cm layout), English label `STAGE_XX: <Name>`, visible on minimap and overview map. Origins registered in `references/level_manifest.md`.
+  - [x] Place floor base (`BP_BeefJerky_Floor_A`) at each origin (`STAGE_01`–`STAGE_10`) via manual editor duplication (`fig05_fixed_stage_constellation_floors.png`).
+  - [ ] Register entry teleporters and Gameplay Tags in `references/level_manifest.md` when those devices exist.
+- [>] **2.2. `Scene Flow Router` (`scene_flow_router.verse`)**
+  - [x] Implement round cycle: hub Action starts a run, each clear waits `IntermissionDelay` (2.5s) then teleports into a random unvisited stage. Hub return is Run Over or Run Victory only. Compiled. `@editable` wiring still open.
+  - [x] Implement Combat Set win condition (`TargetEliminations`, or every guard spawned this Take eliminated) and Stunt Set win condition (`FinishTrigger`).
+  - [x] Stunt Double Lives (`StartingLives` default 3): a death with lives left retries the current stage entry and resets that stage's enemies. Zero lives is Run Over (hub, lives and rolls reset).
+  - [x] Replenish `ClearRollBonus` on each clear. Run Victory fills rolls to `MaxFilmRolls`. Run Over uses `ResetRolls` with `RunOverFilmRolls`.
+  - [ ] Wire `EditRemote`, `HubReturnTeleporter`, `TakeStartTrigger`, and `Stages` in the Details panel, then playtest the room-to-room loop.
 - [ ] **2.3. Director Stanley Integration (Walkie-Talkie Modifier)**
   - [ ] Place Stanley NPC / Director's Chair prop in `01_BackstageHub`.
   - [ ] Configure native UEFN `Conversation Device` with short, frantic 1980s Hollywood director lines (100% English).
-  - [ ] Wire debrief trigger upon returning to the Backstage Hub between Takes.
+  - [ ] Wire debrief trigger when the player returns to the Backstage Hub on Run Over or Run Victory.
 - [ ] **2.4. Phase 2 Full Loop Playtest**
-  - [ ] Test full loop: Spawn in Hub -> Talk to Stanley -> Teleport to Set 1 -> Clear Set using Director's Remote -> Return to Hub.
+  - [ ] Test full loop: Spawn in Hub -> Action -> clear a set -> next random unvisited set without the hub -> Run Victory or Run Over returns to the Hub.
   - [ ] Log Phase 2 milestone in `devlog/telemetry_log.md` (+ screenshot).
 
 ---

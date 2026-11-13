@@ -64,7 +64,7 @@
 1. **`Shared Data & Stage Registry`:** Tool costs, stage IDs, spawner configurations, countdown limits.
 2. **`Edit Remote Controller`:** Signal Remote bindings, inventory roll deduction, tool execution pipeline.
 3. **`Film Strip UI Controller`:** Viewport card presentation, selection capture, mutator dispatch.
-4. **`Scene Flow Router`:** Round cycle management, teleporter routing, win/loss (Take depletion) conditions.
+4. **`Scene Flow Router`:** Room-to-room run. Random unvisited stage after each clear. Hub only for lobby, Run Over, and Run Victory.
 
 ---
 
@@ -73,6 +73,7 @@
 *Log architectural pivots, feature reductions, and deliberate cuts here to maintain a tight, polished delivery within the 93-hour jam window:*
 
 - **Cut #01 (Pre-Kickoff): Procedural Generation Cut:** Procedural tile generation was cut in favor of a fixed-stage constellation topology with teleporter routing. Prevents AI NavMesh breakdown and unvalidated physics collisions.
+- **Pivot #02 (Phase 2.2): Hub-between-takes cut:** A clear no longer returns to the Backstage Hub. After `IntermissionDelay` (default 2.5s) the run teleports into a random unvisited stage. The Hub remains the lobby, the Run Over respawn, and the Run Victory wrap.
 
 ---
 
@@ -83,6 +84,6 @@
 - **[x] Phase 1: Foundational Sandbox & Remote Core (VERIFIED COMPLETE)**
   - *Hub Environment:* Floor envelope placed, Player Spawner active, dressing room prop palette curated.
   - *Remote Logic & Tier 1 HUD:* `edit_remote_device.verse` compiles cleanly and is verified live: trigger-bridged `CUT!` (aim dot-product query, refund on miss) and `FREEZE FRAME` (enemy stasis, generation-counter timeout), plus Tier 1 Verse HUD at `HudTopOffset = 240.0`, `RemoteHeldChecker` held-item gating, and `Cut` crosshair (`White` / `Tomato`). *(Optional VFX/SFX hooks `1.4.6` deferred).*
-- **[>] Phase 2: Stage Generation & Scene Flow Infrastructure (ACTIVE)** *(Modular arena sets, diegetic lighting, Scene Flow Router, Stanley Conversation Device)*
+- **[>] Phase 2: Stage Generation & Scene Flow Infrastructure (ACTIVE)** *(Modular arena sets, diegetic lighting, Scene Flow Router room-to-room run compiled, wiring still open, Stanley Conversation Device)*
 - **[ ] Phase 3: Meta-Progression, Audio & Extended Tools** *(Film Strip UMG UI, `REWIND` circular buffer, `FAST-FORWARD`, audio SFX)*
 - **[ ] Phase 4: Validation, Trailer & Submission** *(100% English audit, Glass Box devlog export, Private Version Code generation, 30-60s 1080p trailer)*
